@@ -1,11 +1,12 @@
 # Experiment to replicate in this project
 
-Paper:
-Experiment:
+Paper: (possibly) Madore, Addis, and Schacter (2015)
+
+Experiment: Experiment 1
 
 # Directory structure
 
 * `original_paper/whoeverEtAl2015.pdf`
 * `writeup/propsal.Rmd`
-	- A short justification for your choice of experiment in terms of your research interests or research program (1 paragraph). This justification should tell us why you chose this particular result—this section is especially important if you are choosing a result outside of the list provided below.
+	- A short justification for my choice of this experiment. (But also, I'm going to look for other papers outside of Psych Science 2015)
 	- A description of the stimuli and procedures that will be required to conduct this experiment, and what the challenges will be (1-2 paragraphs).
