@@ -9,46 +9,10 @@ output:
 
 ## Introduction
 
-I have chosen to replicate either Madore, Addis, and Schacter (2015) or... another paper, that I haven't found yet.
+I'm still looking for a paper. I'll have one by the end of today.
 
-## Madore, Addis, & Schacter (2015): Experiment 1
+## Justification
 
-### Justification
-
-I'm interested in doing research on explanation and intuitive theories, but I didn't see a lot of relevant papers in Psychological Science (2015). There was one neuro paper on what areas of the brain are involved in social explanation and several papers that elicited coarse information about people's lay theories of various domains (many of which other students are planning to replicate). I'm going to keep looking for papers outside of last year's Psych Science, and I'll add another paper to this proposal once I have. But if I decide to replicate a paper from Psych Science, I could try to replicate Madore, Addis, and Schacter (2015) Experiment 1.
-
-I'm choosing this because I find it a kind of intriguing result, but also, I would like to be able to have somewhat interactive mTurk studies in the future (eliciting more information about topics participants bring up), and trying to reproduce a version of the episodic-specificity induction from Madore, Addis, and Schacter (2015) that interacts with participants automatically, if I can reproduce it at all, could be a useful challenge for me.
+I'm interested in doing research on explanation and representation of causal relationships. I didn't see a lot of relevant papers in Psychological Science (2015). There was one neuro paper on what areas of the brain are involved in social explanation and several papers that elicited coarse information about people's lay theories of various domains (many of which other students are planning to replicate). I'm going to keep looking for papers outside of last year's Psych Science, and I'll add a paper to this proposal once I have (by tonight, hopefully).
 
 ### Description of experiment
-
-The authors showed participants a video, then did an "induction" exercise with the participants where they asked questions probing either specific episodic details or more general information (this was the manipulation). After that participants did three different tasks: alternative uses task, control task, and imagination task.
-
-#### Episodic-specificity Induction
-
-Ask participants to close their eyes and specifically remember as much about the surroundings, the people, and the actions as they can. Ask for more detail about some of the things they mention, and for other details that are part of the script. It would definitely be a challenge for me to collect details from participants in such a way that I can automatically ask for more. Even if I couldn't do the interactive version of the script, I might be able to get enough detail from participants that the training has a similar effect.
-
-#### Control induction
-
-Ask participants for opinions, extrapolations, related memories, etc. based on the video, but nothing about specific episodic details.
-
-#### Alternative uses task (AUT)
-
-Participants listed as many created uses for an everyday object as they could think of. Uses in this list were later excluded if they were scored as innappropraite/nonsensical uses by raters blind to condition and hypothesis.
-
-#### Object Association task (OAT)
-
-Participants listed as many associated objects for an everyday object as they could think of. Objects in this list were later excluded if they were scored as not actually associated to the target object by raters blind to condition and hypothesis.
-
-#### Imagination task (manipulation check)
-
-Participants described, in as much detail as possible, an event that involved a particular everyday object and that could happen to them within the next two years. Details were classified as "internal" (specific and episodic) or "external" (facts, commentary, etc.)  by raters blind to condition and hypothesis. This was previously shown to be sensitive to an episodic-specificity induction.
-
-#### Challenges
-
-The induction requires interaction between what information the participant provides and the followup questions that they are asked. I might be able to do the experiment without tailoring followup questions to participants, but it would be neat if I could at least have a crude way to followup on what participants already said to get more details. The three dependent measures in Madore, Addis, and Schacter (2015) require someone, blind to condition and hypotheses, to score responses.
-
-## Conclusion
-
-Experiment 1 in Madore, Addis, and Schacter (2015) would be challenging because it involves some level of interaction with participants' responses and used raters blind to condition and hypotheses to score the data. But finding a way to have some level of automatic interaction with participants' responses could be very useful for me.
-
-I'll keep looking for papers outside of Psyc Science that would be more relevant to my research (and more feasible) and add one in to this proposal once I have one.
