@@ -11,9 +11,7 @@ output:
 
 I would like to replicate Walsh & Sloman (2004), Experiment 2.
 
-## Justification
-
-I'm interested in doing research on explanation and representation of causal relationships. I didn't see a lot of relevant papers in Psychological Science (2015). There was one neuro paper on what areas of the brain are involved in social explanation and several papers that elicited coarse information about people's lay theories of various domains that didn't seem particularly helpful to me.
+I'm interested in doing research on explanation and representation of causal relationships. I didn't see a lot of relevant papers in Psychological Science (2015). There was one neuro paper on what areas of the brain are involved in social explanation and several papers that elicited coarse information about people's lay theories of various domains that didn't seem particularly helpful to me. I have a secondary project from Psych Science that I could do if I have extra time and energy (see ![`secondary-project`](../../secondary-project/)).
 
 Walsh & Sloman (2004) in their Experiment 2 elicit explanations from participants and use the elicited explanations to ask about probability judgments.
 
