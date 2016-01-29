@@ -4,6 +4,7 @@
   <title>Questions about tiny stories</title>
   <script src="js/jquery-2.2.0.min.js"></script>
   <script src="js/underscore-min.js"></script>
+  <script src="js/names.js"></script>
   <link rel="stylesheet" href="css/experimentStyle.css" />
   <link rel="stylesheet" href="css/styleReplicationWalshSlomann2004.css" />
 </head>
@@ -16,7 +17,7 @@
     <p class="block-text">
       {{}} 
     </p>
-    <button type="button" class="continue">Start</button>
+    <button type="button" class="start">Start</button>
     <!-- Legal blurb that we're required to show. -->
     <div id="legal">
       <p>
@@ -27,11 +28,13 @@
       </p>
     </div>
   </div>
-  <div class="slide" id="probability">
+  <div class="slide block" id="probability">
     <!-- questions 1, 3, 4, 5 -->
+    <button type="button" onclick="experiment.next()">Submit</button>
   </div>
-  <div class="slide" id="explanationAndProbability">
+  <div class="slide block" id="explanationAndProbability">
     <!-- question 2 -->
+    <button type="button" onclick="experiment.next()">Submit</button>
   </div>
   <div class="slide" id="finished">
     <p>You're finished - thanks for participating! Submitting to Mechanical Turk...</p>

@@ -37,6 +37,15 @@ body {
   font-size: 0.8em;
 }
 
+p, ul {
+  width: 500px;
+  margin: 0.3em auto 1em auto;
+}
+
+ul {
+  text-align: left;
+}
+
 /***** logo *****/
 
 #stanfordHeader {
