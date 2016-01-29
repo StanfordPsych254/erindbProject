@@ -60,6 +60,18 @@ ul {
   font-weight: bold;
 }
 
+.left {
+  float: left;
+}
+
+#slider {
+  clear: both;
+}
+
+.right {
+  float: right;
+}
+
 /***** button styles *****/
 
 button {

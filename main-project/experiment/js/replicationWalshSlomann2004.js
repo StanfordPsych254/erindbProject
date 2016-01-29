@@ -61,7 +61,8 @@ var stories = [
     label: "fitness",
     cause: {
       gerund: "jogging regularly",
-      pastPerfect: "jogged regularly"
+      pastPerfect: "jogged regularly",
+      pastPerfect: "did not jog regularly"
     },
     effects: [
       {
@@ -94,15 +95,26 @@ function setCauses(story) {
   $("#trial").prepend(causes);
 }
 function drawSlider() {
-  $(".response").empty();
-  $(".response").append($("<div>", {id: "slider"}));
+  experiment.state.sliderValue = -1;
+  $("#sliderContainer").remove();
+  var sliderContainer = $("<div>", {id: "sliderContainer"});
+  $(sliderContainer).append($("<div>", {text: "extremely unlikely", class: "left"}));
+  $(sliderContainer).append($("<div>", {text: "extremely likely", class: "right"}));
+  $(sliderContainer).append($("<div>", {id: "slider"}));
+  $(".response").append(sliderContainer);
   $(".ui-slider-handle").hide();
   $("#slider").slider({
     min: 0,
     max: 1,
     step: 0.01,
-    slide: function() {
+    slide: function(event, ui) {
       $(".ui-slider-handle").show();
+      experiment.state.sliderValue = ui.value;
+      experiment.data.events.push({
+        type: "slider",
+        time: time(),
+        value: ui.value
+      })
     }
   });
 }
@@ -145,6 +157,11 @@ function responseError(qtype) {
 
 // -------- experiment structure ----------
 var experiment = {
+  data: {
+    trials: [],
+    events: [],
+    randomSeed: aRandomSeed,
+  },
   state: {
     trialnum: -1,
     responsenum: -1,
@@ -152,6 +169,8 @@ var experiment = {
     blockN: -1,
     qnum: -1,
     storyLabel: "",
+    story: {},
+    sliderValue: -1,
     name: "",
     gender: "",
     next: function() {
@@ -171,41 +190,72 @@ var experiment = {
     experiment.state.blockN = 5;
     experiment.state.qnum = -1;
     var story = stories.shift();
-    experiment.state.story = story.label;
+    experiment.state.story = story;
+    experiment.state.storyLabel = story.label;
     setCauses(story);
     experiment.question();
   },
   question: function() {
-    $(".err").hide();
     experiment.state.qnum++;
     var qtype = qtypes[experiment.state.qnum];
     experiment.state.qtype = qtype;
-
+    var story = experiment.state.story;
     experiment.state.next = function() {
       var responseValid = experiment.logResponse(qtype);
       if (responseValid) {
-        return experiment.question();
+        (experiment.state.qnum == experiment.state.blockN - 1) ?
+              experiment.nextBlock() :
+              experiment.question();
       } else {
         responseError(qtype)
       }
-    };
-    if (experiment.state.qnum == experiment.state.blockN - 1) {
-      experiment.state.next = function() {
-        var responseValid = experiment.logResponse(qtype);
-        if (responseValid) {
-          return experiment.nextBlock();
-        } else {
-          responseError(qtype)
-        }
-      }
     }
+    $(".err").hide();
     showSlide("trial");
+    var name;
+    if (experiment.state.qnum != 2) {
+      $(".response").empty();
+      name = names.shift();
+      experiment.state.name = name;
+    } else {
+      name = experiment.state.name;
+    }
+    var prompt;
     switch(experiment.state.qnum) {
       case 0:
+        prompt = $("<p>", {
+          class: "prompt",
+          html: [
+                name.Name,
+                story.cause.pastPerfect + ".",
+                "How likely is it that",
+                pronoun("they"),
+                story.effects[0].pastPerfect + "?"
+              ].join(" ")
+        });
         break;
       case 1:
+        prompt = $("<p>", {
+          class: "prompt",
+          html: [
+                name.Name,
+                story.cause.pastPerfect,
+                "but",,
+                pronoun("they"),
+                story.effects[1].negationPastPerfect + ".",
+                "Why?"
+              ].join(" ")
+        });
         break;
       case 2:
+        prompt = $("<p>", {
+          class: "prompt",
+          html: [
+                "How likely is it that",,
+                pronoun("they"),
+                story.effects[0].pastPerfect + "?"
+              ].join(" ")
+        });
         break;
       case 3:
         break;
@@ -215,12 +265,44 @@ var experiment = {
         console.log("error 235: you shouldn't have gotten here. qnum=" +
               experiment.state.qnum);
     }
-    drawSlider();
-    var name = names.shift();
+    $(".response").append(prompt);
+    if (qtype == "probability") {
+      drawSlider();
+    } else {
+      var explanationResponse = $("<p>", {html: "Because <input type='text' size='35' id='explanation'></input>."});
+      $(".response").append(explanationResponse);
+    }
     setPronouns(name.gender);
+    experiment.state.trialStartTime = time();
   },
   logResponse: function(qtype) {
-    return false;
+    switch(qtype) {
+      case "probability":
+        var responseTime = time();
+        var response = experiment.state.sliderValue;
+        if (response>=0 & response <=1) {
+          experiment.data.trials.push({
+            response: response,
+            time: responseTime,
+            rt: responseTime - experiment.state.trialStartTime,
+            qtype: qtype,
+            story: experiment.state.storyLabel,
+            name: experiment.state.name,
+            trialnum: experiment.state.trialnum,
+            qnum: experiment.state.qnum,
+            blocknum: experiment.state.blocknum
+          });
+          return true;
+        } else {
+          return false;
+        }
+        break;
+      case "explanation":
+        return false;
+        break;
+      default:
+        console.log("error 7654: qtype=" + qtype);
+    }
   },
   finished: function() {
     clearInterval(mouseLoggerId);
@@ -252,7 +334,6 @@ $(document).ready(function() {
 ///// record all the events
 var x = 0;
 var y = 0;
-var events = [];
 
 var slideLeftMargin = parseFloat($(".slide").css("margin-left")) +
       parseFloat($(".slide").css("padding-left"))
@@ -262,7 +343,7 @@ document.onmousemove = function(e) {
   y = e.pageY / $(".slide").height();
 };
 $(document).click(function(e) {
-  events.push({
+  experiment.data.events.push({
         type: "click",
         x: x,
         y: y,
@@ -270,7 +351,7 @@ $(document).click(function(e) {
   });
 });
 $(document).keyup(function(e){
-  events.push({
+  experiment.data.events.push({
         type: "keyup",
         keyCode: e.keyCode,
         key: String.fromCharCode(e.keyCode),
@@ -282,7 +363,7 @@ $(document).ready(function() {
   $(".continue").click(function() {
     $(this).unbind("click");
     this.blur();
-    events.push({
+    experiment.data.events.push({
           type: "click",
           x: x,
           y: y,
@@ -291,7 +372,7 @@ $(document).ready(function() {
     experiment.next();
   });
   mouseLoggerId = setInterval(function(e) {
-    events.push({
+    experiment.data.events.push({
           type: "position",
           x: x,
           y: y,

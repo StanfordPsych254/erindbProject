@@ -4,6 +4,26 @@
 	margin: 10px auto;
 }
 
+#sliderContainer {
+	width: 600px;
+	margin: auto;
+}
+
 .ui-slider-handle {
 	display: none;
+}
+
+.response {
+	margin: 30px;
+}
+
+.causalStatements {
+	width: 25em;
+}
+.causalStatements li {
+	margin-left: 2em;
+}
+
+#explanation {
+	size: 100;
 }
