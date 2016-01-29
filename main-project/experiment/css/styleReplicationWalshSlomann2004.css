@@ -1,0 +1,9 @@
+#slider {
+	width: 500px;
+	height: 10px;
+	margin: 10px auto;
+}
+
+.ui-slider-handle {
+	display: none;
+}

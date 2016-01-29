@@ -3,8 +3,17 @@
 <head>
   <title>Questions about tiny stories</title>
   <script src="js/jquery-2.2.0.min.js"></script>
+  <script src="js/jquery-ui.js"></script>
   <script src="js/underscore-min.js"></script>
+
+  <!-- some common names with no repeats -->
   <script src="js/names.js"></script>
+
+  <!-- sample random seed for playback later -->
+  <script>var aRandomSeed = Math.random();</script>
+  <script src="js/seedrandom.min.js"></script>
+
+  <link rel="stylesheet" href="css/jquery-ui.css" />
   <link rel="stylesheet" href="css/experimentStyle.css" />
   <link rel="stylesheet" href="css/styleReplicationWalshSlomann2004.css" />
 </head>
@@ -28,17 +37,18 @@
       </p>
     </div>
   </div>
-  <div class="slide block" id="probability">
-    <!-- questions 1, 3, 4, 5 -->
-    <button type="button" onclick="experiment.next()">Submit</button>
-  </div>
-  <div class="slide block" id="explanationAndProbability">
-    <!-- question 2 -->
-    <button type="button" onclick="experiment.next()">Submit</button>
+  <div class="slide" id="trial">
+    <ul class="causalStatements">{{}}</ul>
+    <div class="response">{{}}</div>
+    <button type="button" onclick="experiment.state.next()">Submit</button>
+    <p class="err">{{}}</p>
   </div>
   <div class="slide" id="finished">
     <p>You're finished - thanks for participating! Submitting to Mechanical Turk...</p>
   </div>
+
+  <!-- set random seed for playback later -->
+  <script>Math.seedrandom(aRandomSeed);</script>
   <script src="js/replicationWalshSlomann2004.js"></script>
 </body>
 </html>
