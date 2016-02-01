@@ -1,0 +1,121 @@
+---
+title: "Replication of Study 1 (AUT only) by Madore, Addis & Schacter (2015, *Psychological Science*)"
+author: |
+  | Erin Bennett
+  | `erindb@stanford.edu`
+output:
+  pdf_document:
+    toc: false
+    highlight: zenburn
+    toc_depth: 3
+---
+
+# Introduction
+
+The main idea of this study is that training people to remember specific episodic details may help them be more creative. Participants were assigned to either an experimental (episodic detail) or a control (general questions) interview. Those in the experimental group could think of more novel but plausible uses of everyday items.
+
+# Methods
+
+## Power analysis
+
+## Planned sample
+
+The original study recruited college undergraduates, but I will recruit participants from Amazon's Mechanical Turk.
+
+## Materials
+
+### Video clip
+
+I'm not sure what video clip they used. It was apparently a man and a woman doing various activities around the house. I will ask them for their materials.
+
+### Episodic induction
+
+In a semi-interactive interview, participants will be asked about the following:
+
+* **Mental imagery about the surroundings:** Close your eyes for a moment and try to get a picture of the types of things that were in the video, how they were arranged, and what they looked like. Once you have a really good picture in your head, please write what you remember in the box provided.
+* **General probing about the surroundings:** Tell me more about *[details mentioned]*/how the kitchen was arranged/what was in the kitchen/were there any other rooms?
+* **Mental imagery about the people:** Now please close your eyes and get another picture in your head, this time abou the people in the video you watched. Please think about what the people looked like and what they were wearing. Once you have a really good picture in your head, please type everything you remember about the people in the video into the box below.
+* **General probing about the people:** Tell me more about *[details mentioned]*/the (man|woman)'s (outfit|face). What color hair did the (man|woman) have?
+* **Mental imagery about the actions:** Now please close your eyes and get a picture in your head of what the people were doing in the video and how they did these things. Once you have a really good picture in your head, please type what you remember in the box below, starting with the first action and ending with the last one. Try to be as specific and detailed as you can.
+* **General probing about the actions:** Tell me more about *[actions mentioned]*.
+
+### Control induction
+
+In a semi-interactive interview, participants will be asked about the following:
+
+* First, please type in the box below what you thought about the video. Just tell me what your thoughts and opinions of it were. What were your general impressions of the video?
+* What adjectives would you use to describe the (setting|people|actions) of the video?
+* Did you have any other opinions about the (setting|people|actions) of the video?
+* What one or two words would you use to describe the whole video?
+* Did you like the video?
+* When do you think the video was made?
+* How do you think it was made? (what equipment do you think they used?)
+* Did the video remind you of anything? (from your own life)
+* Can you guess how big the place was?
+* Can you guess the people’s occupations?
+* Were there any other thoughts or opinions you had about the video? Is there anything else you wanted to say about it?
+
+### Alternate uses task
+
+For seventeen different everyday objects (from *Guilford, J. P., et al. "Alternate uses: Manual of instructions and interpretation." Orange, CA: Sheridan Psychological Services (1978). APA*), participants will be asked to list as many unusual and creative uses as possible. "Although each object has a common use, you should generate as many other uses as you can in as much detail as you can."
+
+## Procedure
+
+First, participants will watch a short video clip. Then they will do either an episodic or control interview. Then they will do the AUT task. Then they will fill out a short questionnaire about the study, after which they will be debriefed about the study.
+
+## Analysis plan
+
+### Scoring responses to AUT
+
+"Along with categories of appropriate uses, AUT responses were scored for total fluency, appropriateness, flexibility, elaboration, and creativity (Addis et al., 2014; Benedek et al., 2014; Guilford, 1967). Total fluency reflects the total number of uses generated excluding repetitions. Appropriateness reflects whether each use could actually work. Flexibility reflects the number of categories the uses fell under for each cue (irrespective of appropriateness). Elaboration reflects how detailed each use was (rating of 0 = brief to 2 = more detailed). Creativity reflects how original and unusual each use was (rating of 1 = uncreative to 4 = very creative), with the highest ratings reserved for uses that raters judged that only a few people could come up with." -Madore et al. (2015)
+
+### Results to repliate
+
+I will be attempting to replicate the following effects:
+
+* in a 2 (control vs. episodic interview) x 2 (task: OAT vs. AUT) repeated measures ANOVA where the dependent measure is the number of categories of appropriate uses:
+    - no main effect of interview type
+    - no main effect of task type
+    - an interaction between interview type and task type
+    
+**Note:** I'm going to think some more (and read their paper more carefully) about whether I need the OAT control task in order to replicate. If I do, then there will soon be another section in here talking about the OAT.
+
+## Differences from original study
+
+The original study recruited college undergraduates, but I will recruit participants from Amazon's Mechanical Turk. I think the main relevant difference between these populations are:
+
+  * that participants on Mechanical Turk may have seen tasks similar to the AUT before.
+  * that participants on Mechanical Turk would be available to participate for less time than undergraduates.
+  * Turkers have more control over their time during the task (i.e. it will be hard to get them to spend a similar amount of time on the interviews)
+  
+The first concern is easily resolvable by a questionnaire about whether participants saw a task like this before. I could exclude participants who had, or use their response to this question as an additional factor that might affect their success.
+
+The second concern means that my replication will be a between subjects design and be storter.
+
+The third concern will be more complicated to resolve. Trying to get people to actually spend the time closing their eyes and visualizing will be difficult and it might be impossible to determine for sure if they are cooperating. Having timers of some kind might help, asking people to spend, e.g. 30 seconds visualizing before they can type.
+
+Because participants are doing these tasks online, they will have to type all of their responses rather than say them aloud, which might make it harder for participants in the episodic interview to close their eyes and visualize what they saw.
+
+The original study involved a human interviewer, who could dynamically adjust their questions specifically for each participant. I will attempt to use NLP techniques to simulate a similar interview with some interaction, and I can use knowledge about the video to assist with this. However, my version of the interview might be less probing and require participants to visualize less thoroughly than the original.
+
+For all of these reasons, my replication will have much less sensitivity than the original study, and so a lack of replication in this new format would not necessarily invalidate the previous results. A successful replication would however be very informative.
+
+# Methos Addendum
+
+## Actual sample
+
+## Differences from pre-date collection methods plan
+
+# Results
+
+## Data preparation
+
+## Confirmatory analysis
+
+## Exploratory analyses
+
+# Discussion
+
+## Summary of replication attempt
+
+## Commentary
