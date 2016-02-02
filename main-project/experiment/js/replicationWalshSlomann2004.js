@@ -34,6 +34,9 @@ function showSlide(id) {
   // Show just the slide we want to show
   $("#"+id).show();
 }
+function negate(explanation) {
+  return explanation;
+}
 
 // -------- items ----------
 var stories = [
@@ -62,7 +65,7 @@ var stories = [
     cause: {
       gerund: "jogging regularly",
       pastPerfect: "jogged regularly",
-      pastPerfect: "did not jog regularly"
+      negationPastPerfect: "did not jog regularly"
     },
     effects: [
       {
@@ -187,7 +190,7 @@ var experiment = {
   },
   block: function() {
     experiment.state.blocknum++;
-    experiment.state.blockN = 5;
+    experiment.state.blockN = 6;
     experiment.state.qnum = -1;
     var story = stories.shift();
     experiment.state.story = story;
@@ -258,8 +261,46 @@ var experiment = {
         });
         break;
       case 3:
+        prompt = $("<p>", {
+          class: "prompt",
+          html: [
+                name.Name,
+                story.cause.pastPerfect + 
+                " and you don't know whether " +
+                experiment.state.explanation + ".",
+                "How likely is it that",
+                pronoun("they"),
+                story.effects[0].pastPerfect + "?"
+              ].join(" ")
+        });
         break;
       case 4:
+        prompt = $("<p>", {
+          class: "prompt",
+          html: [
+                name.Name,
+                story.cause.pastPerfect + 
+                " and " +
+                negate(experiment.state.explanation) + ".",
+                "How likely is it that",
+                pronoun("they"),
+                story.effects[0].pastPerfect + "?"
+              ].join(" ")
+        });
+        break;
+      case 5:
+        prompt = $("<p>", {
+          class: "prompt",
+          html: [
+                name.Name,
+                story.cause.pastPerfect + 
+                " and " +
+                experiment.state.explanation + ".",
+                "How likely is it that",
+                pronoun("they"),
+                story.effects[0].pastPerfect + "?"
+              ].join(" ")
+        });
         break;
       default:
         console.log("error 235: you shouldn't have gotten here. qnum=" +
@@ -276,9 +317,9 @@ var experiment = {
     experiment.state.trialStartTime = time();
   },
   logResponse: function(qtype) {
+    var responseTime = time();
     switch(qtype) {
       case "probability":
-        var responseTime = time();
         var response = experiment.state.sliderValue;
         if (response>=0 & response <=1) {
           experiment.data.trials.push({
@@ -298,7 +339,25 @@ var experiment = {
         }
         break;
       case "explanation":
-        return false;
+      	var response = $("#explanation").val();
+      	experiment.state.explanation = response;
+      	if (response.length > 0) {
+      		// log response
+      		experiment.data.trials.push({
+      			response: response,
+      			time: responseTime,
+	            rt: responseTime - experiment.state.trialStartTime,
+	            qtype: qtype,
+	            story: experiment.state.storyLabel,
+	            name: experiment.state.name,
+	            trialnum: experiment.state.trialnum,
+	            qnum: experiment.state.qnum,
+	            blocknum: experiment.state.blocknum
+      		})
+      		return true;
+      	} else {
+      		return false;
+      	}
         break;
       default:
         console.log("error 7654: qtype=" + qtype);
