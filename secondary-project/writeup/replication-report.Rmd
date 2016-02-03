@@ -71,16 +71,11 @@ First, participants will watch a short video clip. Then they will do either an e
 
 ### Results to repliate
 
-I will be attempting to replicate the following effects:
-
-* in a 2 (control vs. episodic interview) x 2 (task: OAT vs. AUT) repeated measures ANOVA where the dependent measure is the number of categories of appropriate uses:
-    - no main effect of interview type
-    - no main effect of task type
-    - an interaction between interview type and task type
-    
-**Note:** I'm going to think some more (and read their paper more carefully) about whether I need the OAT control task in order to replicate. If I do, then there will soon be another section in here talking about the OAT.
+The main hypothesis for this study was actually that there would be an interaction between interview type and task type in a 2 (control vs. episodic interview) x 2 (task: OAT vs. AUT) repeated measures ANOVA where the dependent measure is the number of categories of appropriate uses. That requires using another task, which I would rather not do (but I *could*). The authors also found that "participants generated more categories of appropriate uses when they received the specificity induction than when they received the control induction." I plan to replicate this effect.
 
 ## Differences from original study
+
+### Participants
 
 The original study recruited college undergraduates, but I will recruit participants from Amazon's Mechanical Turk. I think the main relevant difference between these populations are:
 
@@ -90,13 +85,17 @@ The original study recruited college undergraduates, but I will recruit particip
   
 The first concern is easily resolvable by a questionnaire about whether participants saw a task like this before. I could exclude participants who had, or use their response to this question as an additional factor that might affect their success.
 
-The second concern means that my replication will be a between subjects design and be storter.
+The second concern means that my replication will be a *between* subjects design and be storter.
 
 The third concern will be more complicated to resolve. Trying to get people to actually spend the time closing their eyes and visualizing will be difficult and it might be impossible to determine for sure if they are cooperating. Having timers of some kind might help, asking people to spend, e.g. 30 seconds visualizing before they can type.
+
+### Setting
 
 Because participants are doing these tasks online, they will have to type all of their responses rather than say them aloud, which might make it harder for participants in the episodic interview to close their eyes and visualize what they saw.
 
 The original study involved a human interviewer, who could dynamically adjust their questions specifically for each participant. I will attempt to use NLP techniques to simulate a similar interview with some interaction, and I can use knowledge about the video to assist with this. However, my version of the interview might be less probing and require participants to visualize less thoroughly than the original.
+
+### Conclusion
 
 For all of these reasons, my replication will have much less sensitivity than the original study, and so a lack of replication in this new format would not necessarily invalidate the previous results. A successful replication would however be very informative.
 
