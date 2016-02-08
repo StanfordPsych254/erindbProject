@@ -43,5 +43,5 @@
       "Name": male_names.pop()
     });
   }
-  return names;
+  return _.shuffle(names);
 }()

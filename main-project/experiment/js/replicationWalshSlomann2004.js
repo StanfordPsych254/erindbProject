@@ -1,4 +1,7 @@
 // -------- helper functions ----------
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
 function rep(obj, n) {
   return new Array(nBlocks).fill("block");
 }
@@ -11,22 +14,6 @@ function pronoun(genderNeutral) {
   return "<span class='" + genderNeutral + "'>" +
         genderNeutral + "</span>";
 }
-function setPronouns(gender) {
-  switch(gender) {
-    case "male":
-      $(".their").html("his");
-      $(".they").html("he");
-      $(".them").html("him");
-      break;
-    case "female":
-      $(".their").html("her");
-      $(".they").html("she");
-      $(".them").html("her");
-      break;
-    default:
-      console.log("error 234: check gender");
-  }
-}
 // Shows slides. We're using jQuery here - the **$** is the jQuery selector function, which takes as input either a DOM element or a CSS selector string.
 function showSlide(id) {
   // Hide all slides
@@ -35,11 +22,17 @@ function showSlide(id) {
   $("#"+id).show();
 }
 function negate(explanation) {
-  return explanation;
+  return "it is not the case that " + explanation;
+}
+function resolveCorefs(response, name) {
+	response = response.replace(name.Name, pronoun("they"));
+  // todo: use nlp tools like https://github.com/desmond-ong/colorMeText
+	// todo: fix her(pos) vs her(obj) ambiguity and name(subj) vs name(obj) ambiguity
+	return(response);
 }
 
 // -------- items ----------
-var stories = [
+var stories = _.shuffle([
   {
     label: "insomnia",
     cause: {
@@ -50,13 +43,13 @@ var stories = [
     effects: [
       {
         gerund: "difficulty in concentrating",
-        pastPerfect: "had difficulty concentrating",
-        negationPastPerfect: "didn't have difficulty concentrating"
+        pastPerfect: pronoun("they") + " had difficulty concentrating",
+        negationPastPerfect: pronoun("they") + " didn't have difficulty concentrating"
       },
       {
         gerund: "insomnia",
-        pastPerfect: "had insomnia",
-        negationPastPerfect: "didn't have insomnia"
+        pastPerfect: pronoun("they") + " had insomnia",
+        negationPastPerfect: pronoun("they") + " didn't have insomnia"
       }
     ]
   },
@@ -76,12 +69,12 @@ var stories = [
       },
       {
         gerund: "a person to lose weight",
-        pastPerfect: "lost weight",
-        negationPastPerfect: "did not lose weight"
+        pastPerfect: pronoun("they") + " lost weight",
+        negationPastPerfect: pronoun("they") + " did not lose weight"
       }
     ]
   }
-]
+])
 var qtypes = ["probability", "explanation", "probability", "probability", "probability", "probability"];
 function setCauses(story) {
   var causes = $(".causalStatements").empty();
@@ -89,13 +82,32 @@ function setCauses(story) {
   for (var i=0; i<2; i++) {
     causes.append(
       $("<li>", {
-        text: story.cause.gerund +
+        text: story.cause.gerund.capitalize() +
               " causes " +
-              story.effects[i].gerund
+              story.effects[i].gerund + 
+              "."
       })
     );
   }
   $("#trial").prepend(causes);
+}
+
+// -------- drawing functions ----------
+function setPronouns(gender) {
+  switch(gender) {
+    case "male":
+      $(".their").html("his");
+      $(".they").html("he");
+      $(".them").html("him");
+      break;
+    case "female":
+      $(".their").html("her");
+      $(".they").html("she");
+      $(".them").html("her");
+      break;
+    default:
+      console.log("error 234: check gender");
+  }
 }
 function drawSlider() {
   experiment.state.sliderValue = -1;
@@ -160,11 +172,13 @@ function responseError(qtype) {
 
 // -------- experiment structure ----------
 var experiment = {
+  // log data to send to mturk here
   data: {
     trials: [],
     events: [],
     randomSeed: aRandomSeed,
   },
+  // store state information here
   state: {
     trialnum: -1,
     responsenum: -1,
@@ -180,7 +194,7 @@ var experiment = {
       experiment.nextBlock();
     }
   },
-  /// experiment slides
+  // first slide (instructions)
   instructions: function() {
     showSlide("instructions");
     $(".start").click(function() {
@@ -188,16 +202,19 @@ var experiment = {
       experiment.state.next();
     })
   },
+  // run at start of block
   block: function() {
     experiment.state.blocknum++;
     experiment.state.blockN = 6;
     experiment.state.qnum = -1;
     var story = stories.shift();
     experiment.state.story = story;
+    experiment.state.story.effects = _.shuffle(story.effects);
     experiment.state.storyLabel = story.label;
     setCauses(story);
     experiment.question();
   },
+  // run at start of trial (once for every response)
   question: function() {
     experiment.state.qnum++;
     var qtype = qtypes[experiment.state.qnum];
@@ -232,7 +249,6 @@ var experiment = {
                 name.Name,
                 story.cause.pastPerfect + ".",
                 "How likely is it that",
-                pronoun("they"),
                 story.effects[0].pastPerfect + "?"
               ].join(" ")
         });
@@ -243,8 +259,7 @@ var experiment = {
           html: [
                 name.Name,
                 story.cause.pastPerfect,
-                "but",,
-                pronoun("they"),
+                "but",
                 story.effects[1].negationPastPerfect + ".",
                 "Why?"
               ].join(" ")
@@ -254,8 +269,7 @@ var experiment = {
         prompt = $("<p>", {
           class: "prompt",
           html: [
-                "How likely is it that",,
-                pronoun("they"),
+                "How likely is it that",
                 story.effects[0].pastPerfect + "?"
               ].join(" ")
         });
@@ -269,7 +283,6 @@ var experiment = {
                 " and you don't know whether " +
                 experiment.state.explanation + ".",
                 "How likely is it that",
-                pronoun("they"),
                 story.effects[0].pastPerfect + "?"
               ].join(" ")
         });
@@ -283,7 +296,6 @@ var experiment = {
                 " and " +
                 negate(experiment.state.explanation) + ".",
                 "How likely is it that",
-                pronoun("they"),
                 story.effects[0].pastPerfect + "?"
               ].join(" ")
         });
@@ -297,7 +309,6 @@ var experiment = {
                 " and " +
                 experiment.state.explanation + ".",
                 "How likely is it that",
-                pronoun("they"),
                 story.effects[0].pastPerfect + "?"
               ].join(" ")
         });
@@ -340,7 +351,7 @@ var experiment = {
         break;
       case "explanation":
       	var response = $("#explanation").val();
-      	experiment.state.explanation = response;
+      	experiment.state.explanation = resolveCorefs(response, experiment.state.name);
       	if (response.length > 0) {
       		// log response
       		experiment.data.trials.push({
