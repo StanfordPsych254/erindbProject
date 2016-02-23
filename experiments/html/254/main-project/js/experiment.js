@@ -23,7 +23,11 @@ function showSlide(id) {
 }
 function negate(explanation) {
   // todo: make this better using nlp tools
-  return "it is not the case that " + explanation;
+  if (experiment.state.parsedResponse) {
+    return "it is not the case that " + explanation; 
+  } else {
+    return "it is not the case that " + explanation; 
+  }
 }
 function resolveCorefs(response, name) {
   var text = $("#explanation").val();
@@ -32,6 +36,7 @@ function resolveCorefs(response, name) {
     .done(function(data) {
       console.log('i posted and stuff happened.');
       console.log('the response: ' + data);
+      experiment.state.parsedResponse = data;
     });
 
     // todo: use nlp tools like https://github.com/desmond-ong/colorMeText
@@ -294,7 +299,7 @@ var experiment = {
                 story.effects[0].pastPerfect + "?"
               ].join(" ")
         });
-        break;
+        break;e
       case 4:
         prompt = $("<p>", {
           class: "prompt",

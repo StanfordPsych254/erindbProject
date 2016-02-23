@@ -15,3 +15,4 @@ things to do:
 * set up https
 * add more stories
 * add debriefing
+* add checkbox for if echo is gibberish
