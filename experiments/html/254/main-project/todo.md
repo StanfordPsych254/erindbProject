@@ -1,11 +1,11 @@
 things to do:
 
 * question 2a: explanations response
-	* read in explanations
 	* log response
 	* handle hard-to-parse explanations
 	* handle empty explanations
 	* handle error response for explanation
+	* handle explanations simply if server doesn't respond in time
 * other questions
 * instructions
 * send data to mturk
