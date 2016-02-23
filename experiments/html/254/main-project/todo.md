@@ -11,3 +11,6 @@ things to do:
 * send data to mturk
 * keep participants from starting before accepting
 * progress bar
+* start secondary project
+* set up https
+* add more stories

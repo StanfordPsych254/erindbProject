@@ -22,13 +22,21 @@ function showSlide(id) {
   $("#"+id).show();
 }
 function negate(explanation) {
+  // todo: make this better using nlp tools
   return "it is not the case that " + explanation;
 }
 function resolveCorefs(response, name) {
-	response = response.replace(name.Name, pronoun("they"));
-  // todo: use nlp tools like https://github.com/desmond-ong/colorMeText
-	// todo: fix her(pos) vs her(obj) ambiguity and name(subj) vs name(obj) ambiguity
-	return(response);
+  var text = $("#explanation").val();
+  $.post( 'http://erindb.me/cgi-bin/nlp.py',
+          {'text': text, 'annotators': 'parse,depparse,lemma'})
+    .done(function(data) {
+      console.log('i posted and stuff happened.');
+      console.log('the response: ' + data);
+    });
+
+    // todo: use nlp tools like https://github.com/desmond-ong/colorMeText
+    // todo: fix her(pos) vs her(obj) ambiguity and name(subj) vs name(obj) ambiguity
+    return(response);
 }
 
 // -------- items ----------
@@ -350,25 +358,25 @@ var experiment = {
         }
         break;
       case "explanation":
-      	var response = $("#explanation").val();
-      	experiment.state.explanation = resolveCorefs(response, experiment.state.name);
-      	if (response.length > 0) {
-      		// log response
-      		experiment.data.trials.push({
-      			response: response,
-      			time: responseTime,
-	            rt: responseTime - experiment.state.trialStartTime,
-	            qtype: qtype,
-	            story: experiment.state.storyLabel,
-	            name: experiment.state.name,
-	            trialnum: experiment.state.trialnum,
-	            qnum: experiment.state.qnum,
-	            blocknum: experiment.state.blocknum
-      		})
-      		return true;
-      	} else {
-      		return false;
-      	}
+        var response = $("#explanation").val();
+        experiment.state.explanation = resolveCorefs(response, experiment.state.name);
+        if (response.length > 0) {
+          // log response
+          experiment.data.trials.push({
+            response: response,
+            time: responseTime,
+              rt: responseTime - experiment.state.trialStartTime,
+              qtype: qtype,
+              story: experiment.state.storyLabel,
+              name: experiment.state.name,
+              trialnum: experiment.state.trialnum,
+              qnum: experiment.state.qnum,
+              blocknum: experiment.state.blocknum
+          })
+          return true;
+        } else {
+          return false;
+        }
         break;
       default:
         console.log("error 7654: qtype=" + qtype);
@@ -401,7 +409,7 @@ $(document).ready(function() {
   experiment.state.next();
 })
 
-///// record all the events
+// -------- record all the events ----------
 var x = 0;
 var y = 0;
 
