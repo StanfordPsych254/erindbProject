@@ -14,3 +14,4 @@ things to do:
 * start secondary project
 * set up https
 * add more stories
+* add debriefing

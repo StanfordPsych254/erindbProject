@@ -14,8 +14,8 @@
   <script src="js/seedrandom.min.js"></script>
 
   <link rel="stylesheet" href="css/jquery-ui.css" />
-  <link rel="stylesheet" href="css/experimentStyle.css" />
-  <link rel="stylesheet" href="css/experiment.css" />
+  <link rel="stylesheet" href="css/genericExperiment.css" />
+  <link rel="stylesheet" href="css/thisExperiment.css" />
 </head>
 <body>
   <div class="slide" id="instructions">
@@ -39,12 +39,14 @@
     <button type="button" onclick="experiment.state.next()">Submit</button>
     <p class="err">{{}}</p>
   </div>
+  <div class="slide" id="demographic">
+  </div>
   <div class="slide" id="finished">
     <p>You're finished - thanks for participating! Submitting to Mechanical Turk...</p>
   </div>
 
   <!-- set random seed for playback later -->
   <script>Math.seedrandom(aRandomSeed);</script>
-  <script src="js/replicationWalshSlomann2004.js"></script>
+  <script src="js/experiment.js"></script>
 </body>
 </html>

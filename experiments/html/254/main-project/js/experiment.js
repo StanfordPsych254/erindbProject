@@ -382,6 +382,9 @@ var experiment = {
         console.log("error 7654: qtype=" + qtype);
     }
   },
+  demographic: function() {
+    showSlide("demographic");
+  },
   finished: function() {
     clearInterval(mouseLoggerId);
     showSlide("finished");
@@ -403,7 +406,7 @@ var experiment = {
 var nBlocks = stories.length;
 var experimentStates = ["instructions"].concat(
       rep("block", nBlocks)
-    ).concat(["finished"]);
+    ).concat(["demographic", "finished"]);
 
 $(document).ready(function() {
   experiment.state.next();
