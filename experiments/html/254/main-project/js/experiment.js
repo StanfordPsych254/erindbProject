@@ -24,7 +24,38 @@ function showSlide(id) {
 function negate(explanation) {
   // todo: make this better using nlp tools
   if (experiment.state.parsedResponse) {
-    return "it is not the case that " + explanation; 
+    var parse = JSON.parse(experiment.state.parsedResponse.replace(/u?'/g, '"').replace(/\n/g, ''));
+    var root = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='ROOT'})[0];
+    var aux = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='aux' & x.governor==root.dependent});
+    var cc = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='cc' & x.governor==root.dependent}); //for when they give two sub-clauses
+    var tokens = parse.sentences[0].tokens;
+    if (cc.length > 0) {
+      return "it is not the case that " + explanation; 
+    } else if (aux.length > 0) {
+      var negation = [];
+      for (var i=0; i<tokens.length; i++) {
+        if ((i+1)==parseInt(aux[0].dependent)) {
+          negation.push('was');
+          negation.push('not');
+        } else {
+          negation.push(tokens[i].word)
+        }
+      }
+      return negation.join(' ');
+      return negation;
+    } else {
+      var negation = [];
+      for (var i=0; i<tokens.length; i++) {
+        if ((i+1)==parseInt(root.dependent)) {
+          negation.push('did');
+          negation.push('not');
+          negation.push(tokens[i].lemma);
+        } else {
+          negation.push(tokens[i].word)
+        }
+      }
+      return negation.join(' ');
+    }
   } else {
     return "it is not the case that " + explanation; 
   }
