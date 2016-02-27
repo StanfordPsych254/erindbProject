@@ -16,8 +16,4 @@ output = nlp.annotate(text, properties={'annotators': annotators, 'outputFormat'
 
 #this is the actual output
 print "Content-Type: text/html\n"
-print "The text data is: " + data["text"].value
-print "<br />"
-print "The annotator data is: " + data["annotators"].value
-print "<br />"
 print output
