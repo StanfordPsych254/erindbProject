@@ -294,7 +294,7 @@ var experiment = {
       },
       effects: [
         {
-          gerund: "staying up late",
+          gerund: "a person to stay up late",
           pastPerfect: pronoun("they") + " stayed up late",
           negationPastPerfect: pronoun("they") + " didn't stay up late"
         },
@@ -674,6 +674,49 @@ var experiment = {
   },
   demographic: function() {
     showSlide("demographic");
+    $(".language_free").css({display: 'none'});
+    $("#language").change(function() {
+      if ($("#language").val() == 'eng+other' | $("#language").val() == 'other') {
+        $(".languageFree").show();
+      } else {
+        $(".languageFree").hide();
+      }
+    })
+    experiment.state.next = function() {
+      var language = $("#language").val();
+      var languageFree = $("#languageFree").val();
+      var gender = $("#gender").val();
+      var age = $("#age").val();
+      var ethnicity = $("#ethnicity").val();
+      var education = $("#education").val();
+      var studyQuestionGuess = $("#studyQuestionGuess").val();
+      var comments = $("#comments").val();
+      if (language=='' | gender=='' | education=='') {
+        $(".footnote").css({color: "red"});
+        $("#language").click(function() {
+          $(".footnote").css({color: "black"});
+        })
+        $("#gender").click(function() {
+          $(".footnote").css({color: "black"});
+        })
+        $("#education").click(function() {
+          $(".footnote").css({color: "black"});
+        })
+      } else {
+        var demographics = [
+          'language', 'languageFree', 'gender', 'age',
+          'ethnicity', 'education', 'studyQuestionGuess', 'comments'
+        ];
+        experiment.data.demographics = [];
+        for (var i=0; i<demographics.length; i++) {
+          var demographic = demographics[i];
+          experiment.data.demographics.push({
+            response: $("#" + demographic).val(),
+            qtype: demographic
+          })
+        }
+      }
+    }
   },
   finished: function() {
     clearInterval(mouseLoggerId);

@@ -102,6 +102,7 @@ button[disabled] {
 
 .slide {
   border: 1px solid firebrick;
+  position: relative;
 }
 
 a {

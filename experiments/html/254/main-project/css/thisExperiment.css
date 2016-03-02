@@ -36,3 +36,19 @@
 .causalStatements li {
 	margin-left: 2em;
 }
+
+.demographicQuestions {
+	text-align: left;
+}
+
+.footnote {
+	font-size: 0.8em;
+	text-align: right;
+	right: 10px;
+	bottom: 10px;
+	position: absolute;
+}
+
+.languageFree {
+	display: none;
+}
