@@ -21,7 +21,6 @@ body {
   display: none;
   position: relative;
   margin: 0 auto;
-  padding: 1% 2% 1% 2%;
 }
 
 #legal p {
@@ -50,7 +49,7 @@ ul {
 
 #stanfordHeader {
   width: 500px;
-  margin: 0 auto;
+  margin: 3em auto auto auto;
   text-align: center;
   background-color: #8C1516;
   padding: 20px 15px 10px 10px;
@@ -113,4 +112,30 @@ a {
 
 a:hover {
   color: brown;
+}
+
+
+/* Progress Bar */
+.progress{
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+.progress span{
+  position:relative;
+  top: -6px;
+}
+
+.bar-wrapper{
+    height:20px;
+    width:200px;
+    border:1px solid #000000;
+    display:inline-block;
+}
+
+.bar{
+    position:relative;
+    height:100%;
+    width:0px;
+    background-color:#000000
 }

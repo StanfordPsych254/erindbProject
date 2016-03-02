@@ -17,10 +17,21 @@
 	margin: 30px;
 }
 
+#story > .causalStatements {
+	margin-top: 10em;
+	border: 1px solid black;
+}
+
+#trial > .causalStatements {
+	color: gray;
+	border: 1px solid gray;
+	margin-top: 4em;
+}
+
 .causalStatements {
+	padding: 10px;
 	width: 25em;
 	margin-bottom: 4em;
-	color: gray;
 }
 .causalStatements li {
 	margin-left: 2em;

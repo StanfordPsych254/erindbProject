@@ -33,6 +33,10 @@
       </p>
     </div>
   </div>
+  <div class="slide" id="story">
+    <ul class="causalStatements">{{}}</ul>
+    <button type="button" onclick="experiment.state.next()">Continue</button>
+  </div>
   <div class="slide" id="trial">
     <ul class="causalStatements">{{}}</ul>
     <div class="response">{{}}</div>
@@ -43,6 +47,14 @@
   </div>
   <div class="slide" id="finished">
     <p>You're finished - thanks for participating! Submitting to Mechanical Turk...</p>
+  </div>
+  
+  <div class="progress">
+    <span>Progress:</span>
+    <div class="bar-wrapper">
+      <div class="bar" width="0%">
+      </div>
+    </div>
   </div>
 
   <!-- set random seed for playback later -->
