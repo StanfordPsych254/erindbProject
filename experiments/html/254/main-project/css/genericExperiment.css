@@ -119,8 +119,9 @@ a:hover {
 /* Progress Bar */
 .progress{
   position: absolute;
+  bottom: 10px;
+  /*left: 250px;*/
   right: 10px;
-  top: 10px;
 }
 .progress span{
   position:relative;

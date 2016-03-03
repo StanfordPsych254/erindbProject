@@ -22,6 +22,10 @@ function showSlide(id) {
   $("#"+id).show();
 }
 
+$(".slide").append('<div class="progress"><span>Progress: </span>' +
+    '<div class="bar-wrapper"><div class="bar" width="0%">' +
+    '</div></div></div>')
+
 // -------- nlp tools ----------
 var nlp = {
   negate: function(explanation) {
@@ -245,6 +249,7 @@ var experiment = {
   data: {
     trials: [],
     events: [],
+    demographics: [],
     randomSeed: aRandomSeed,
   },
   // store state information here
@@ -707,7 +712,6 @@ var experiment = {
           'language', 'languageFree', 'gender', 'age',
           'ethnicity', 'education', 'studyQuestionGuess', 'comments'
         ];
-        experiment.data.demographics = [];
         for (var i=0; i<demographics.length; i++) {
           var demographic = demographics[i];
           experiment.data.demographics.push({
@@ -715,8 +719,19 @@ var experiment = {
             qtype: demographic
           })
         }
+        experiment.end()
       }
     }
+  },
+  end: function() {
+    clearInterval(mouseLoggerId);
+    experiment.data.startTime = startTime;
+    experiment.data.seed =  aRandomSeed;
+    // Show the finish slide.
+    showSlide("finished");
+    // Wait 1.5 seconds and then submit the whole experiment object to Mechanical Turk (mmturkey filters out the functions so we know we're just submitting properties [i.e. data])
+    setTimeout(function() { turk.submit(experiment.data) }, 1500);
+    console.log(JSON.stringify(experiment.data));
   },
   finished: function() {
     clearInterval(mouseLoggerId);
