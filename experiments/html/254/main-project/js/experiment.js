@@ -803,6 +803,7 @@ var experimentStates = ["instructions"].concat(
 $(document).ready(function() {
 
   // $('.slide').hide(); //hide everything
+  $('#instructions').show();
 
   //make sure turkers have accepted HIT (or you're not in mturk)
   if (turk.previewMode) {
