@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import cgi, cgitb 
+import json
 cgitb.enable()  # for troubleshooting
 
 #the cgi library gets vars from html
@@ -16,4 +17,4 @@ output = nlp.annotate(text, properties={'annotators': annotators, 'outputFormat'
 
 #this is the actual output
 print "Content-Type: text/html\n"
-print output
+print json.dumps(output)
