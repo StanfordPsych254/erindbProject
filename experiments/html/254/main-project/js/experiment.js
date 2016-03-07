@@ -29,98 +29,127 @@ $(".slide").append('<div class="progress"><span>Progress: </span>' +
 // -------- nlp tools ----------
 var nlp = {
   negate: function(explanation) {
-    // todo: make this better using nlp tools
-    if (experiment.state.parsedResponse != "NA") {
-      var parse = JSON.parse(experiment.state.parsedResponse.replace(/u?'/g, '"').replace(/\n/g, ''));
-      var root = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='ROOT'})[0];
-      var aux = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='aux' & x.governor==root.dependent});
-      var cc = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='cc' & x.governor==root.dependent}); //for when they give two sub-clauses
-      var tokens = parse.sentences[0].tokens;
-      if (cc.length > 0) {
-        return "it is not the case that " + nlp.abstractPronouns(explanation); 
-      } else if (aux.length > 0) {
-        var negation = [];
-        for (var i=0; i<tokens.length; i++) {
-          if (tokens[i+1].word == experiment.state.explanationName) {
-            negation.push('<span class=\'name\'>{{}}</span>');
-          } else if (toekns[i+1].pos.startswith('PRP')) {
-            // get dep to verb: obj? subj? poss?
-            // find dependendencies for that word as dependent and get type
-            var dependencies = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dependent==(i+1)});
-            var depTypes = dependencies.map(function(x) {return x.dep;});
-            if (depType.indexOf('nsubj')>=0 | depType.indexOf('nsubjpass')>=0) {
-              negation.push(pronoun('they'));
-            } else if (depType.indexOf('nmod:poss')>=0) {
-              negation.push(pronoun('their'));
-            } else if (depType.indexOf('dobj')>=0) {
-              negation.push(pronoun('them'));
+    try {
+      console.log('negate');
+      // todo: make this better using nlp tools
+      if (experiment.state.parsedResponse != "NA") {
+        var parse = JSON.parse(experiment.state.parsedResponse.replace(/u?'/g, '"').replace(/\n/g, ''));
+        var root = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='ROOT'})[0];
+        var aux = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='aux' & x.governor==root.dependent});
+        var cc = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dep=='cc' & x.governor==root.dependent}); //for when they give two sub-clauses
+        var tokens = parse.sentences[0].tokens;
+        if (cc.length > 0) {
+          return "it is not the case that " + nlp.abstractPronouns(explanation); 
+        } else if (aux.length > 0) {
+          var negation = [];
+          for (var i=0; i<tokens.length; i++) {
+            if (tokens[i+1].word == experiment.state.explanationName) {
+              negation.push('<span class=\'name\'>{{}}</span>');
+            } else if (toekns[i+1].pos.startswith('PRP')) {
+              // get dep to verb: obj? subj? poss?
+              // find dependendencies for that word as dependent and get type
+              var dependencies = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dependent==(i+1)});
+              var depTypes = dependencies.map(function(x) {return x.dep;});
+              if (depType.indexOf('nsubj')>=0 | depType.indexOf('nsubjpass')>=0) {
+                negation.push(pronoun('they'));
+              } else if (depType.indexOf('nmod:poss')>=0) {
+                negation.push(pronoun('their'));
+              } else if (depType.indexOf('dobj')>=0) {
+                negation.push(pronoun('them'));
+              } else {
+                negation.push(toekns[i].word)
+              }
+            } else if ((i+1)==parseInt(aux[0].dependent)) {
+              negation.push('was');
+              negation.push('not');
             } else {
-              negation.push(toekns[i].word)
+              negation.push(tokens[i].word)
             }
-          } else if ((i+1)==parseInt(aux[0].dependent)) {
-            negation.push('was');
-            negation.push('not');
-          } else {
-            negation.push(tokens[i].word)
           }
+          return negation.join(' ').replace(' n\'t', 'n\'t')
+                .replace(' \'s', '\'s')
+                .replace(/\b(his|hers)\b/g, pronoun('theirs'));
+        } else {
+          var negation = [];
+          for (var i=0; i<tokens.length; i++) {
+            if (tokens[i+1].word == experiment.state.explanationName) {
+              negation.push('<span class=\'name\'>{{}}</span>');
+            } else if (toekns[i+1].pos.startswith('PRP')) {
+              // get dep to verb: obj? subj? poss?
+              // find dependendencies for that word as dependent and get type
+              var dependencies = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dependent==(i+1)});
+              var depTypes = dependencies.map(function(x) {return x.dep;});
+              if (depType.indexOf('nsubj')>=0 | depType.indexOf('nsubjpass')>=0) {
+                negation.push(pronoun('they'));
+              } else if (depType.indexOf('nmod:poss')>=0) {
+                negation.push(pronoun('their'));
+              } else if (depType.indexOf('dobj')>=0) {
+                negation.push(pronoun('them'));
+              } else {
+                negation.push(toekns[i].word)
+              }
+            } else if ((i+1)==parseInt(root.dependent)) {
+              negation.push('did');
+              negation.push('not');
+              negation.push(tokens[i].lemma);
+            } else {
+              negation.push(tokens[i].word)
+            }
+          }
+          return negation.join(' ').replace(' n\'t', 'n\'t')
+                .replace(' \'s', '\'s')
+                .replace(/\b(his|hers)\b/g, pronoun('theirs'));
         }
-        return negation.join(' ').replace(' n\'t', 'n\'t')
-              .replace(' \'s', '\'s')
-              .replace(/\b(his|hers)\b/g, pronoun('theirs'));
       } else {
-        var negation = [];
-        for (var i=0; i<tokens.length; i++) {
-          if (false) {
-            var a = 1;
-          } else if ((i+1)==parseInt(root.dependent)) {
-            negation.push('did');
-            negation.push('not');
-            negation.push(tokens[i].lemma);
-          } else {
-            negation.push(tokens[i].word)
-          }
-        }
-        return negation.join(' ').replace(' n\'t', 'n\'t')
-              .replace(' \'s', '\'s')
-              .replace(/\b(his|hers)\b/g, pronoun('theirs'));
+        return "it is not the case that " + nlp.abstractPronouns(explanation); 
       }
-    } else {
-      return "it is not the case that " + nlp.abstractPronouns(explanation); 
+    } catch(e) {
+      return "it is not the case that " + nlp.abstractPronouns(explanation);
     }
   },
   abstractPronouns: function(explanation) {
-    var name = experiment.state.explanationName;
-    if (experiment.state.parsedResponse != "NA") {
-      var parse = JSON.parse(experiment.state.parsedResponse.replace(/u?'/g, '"').replace(/\n/g, ''));
-        var negation = [];
-        for (var i=0; i<tokens.length; i++) {
-          if (tokens[i+1].word == experiment.state.explanationName) {
-            negation.push('<span class=\'name\'>{{}}</span>');
-          } else if (toekns[i+1].pos.startswith('PRP')) {
-            // get dep to verb: obj? subj? poss?
-            // find dependendencies for that word as dependent and get type
-            var dependencies = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dependent==(i+1)});
-            var depTypes = dependencies.map(function(x) {return x.dep;});
-            if (depType.indexOf('nsubj')>=0 | depType.indexOf('nsubjpass')>=0) {
-              negation.push(pronoun('they'));
-            } else if (depType.indexOf('nmod:poss')>=0) {
-              negation.push(pronoun('their'));
-            } else if (depType.indexOf('dobj')>=0) {
-              negation.push(pronoun('them'));
+    console.log('pronouns');
+    try {
+      var name = experiment.state.explanationName;
+      if (experiment.state.parsedResponse != "NA") {
+        var parse = JSON.parse(experiment.state.parsedResponse.replace(/u?'/g, '"').replace(/\n/g, ''));
+          var negation = [];
+          for (var i=0; i<tokens.length; i++) {
+            if (tokens[i+1].word == experiment.state.explanationName) {
+              negation.push('<span class=\'name\'>{{}}</span>');
+            } else if (toekns[i+1].pos.startswith('PRP')) {
+              // get dep to verb: obj? subj? poss?
+              // find dependendencies for that word as dependent and get type
+              var dependencies = parse.sentences[0]['basic-dependencies'].filter(function(x) {return x.dependent==(i+1)});
+              var depTypes = dependencies.map(function(x) {return x.dep;});
+              if (depType.indexOf('nsubj')>=0 | depType.indexOf('nsubjpass')>=0) {
+                negation.push(pronoun('they'));
+              } else if (depType.indexOf('nmod:poss')>=0) {
+                negation.push(pronoun('their'));
+              } else if (depType.indexOf('dobj')>=0) {
+                negation.push(pronoun('them'));
+              } else {
+                negation.push(toekns[i].word)
+              }
+            } else if ((i+1)==parseInt(aux[0].dependent)) {
+              negation.push('was');
+              negation.push('not');
             } else {
-              negation.push(toekns[i].word)
+              negation.push(tokens[i].word)
             }
-          } else if ((i+1)==parseInt(aux[0].dependent)) {
-            negation.push('was');
-            negation.push('not');
-          } else {
-            negation.push(tokens[i].word)
           }
-        }
-        return negation.join(' ').replace(' n\'t', 'n\'t')
-              .replace(' \'s', '\'s');
-      var a = 1;
-    } else {
+          return negation.join(' ').replace(' n\'t', 'n\'t')
+                .replace(' \'s', '\'s');
+        var a = 1;
+      } else {
+        return explanation.toLowerCase().replace(/\b(he|she)\b/g, pronoun('they'))
+              .replace(/\b(he|she)'s\b/g, pronoun('they')+'\'s')
+              .replace(/\b(him|her)\b/g, pronoun('them'))
+              .replace(/\b(his|her)\b/g, pronoun('their'))
+              .replace(/\b(his|hers)\b/g, pronoun('theirs'))
+              .replace((new RegExp(experiment.state.explanationName.Name.toLowerCase(), 'g')), '<span class=\'name\'>{{}}</span>')
+      }
+    } catch(e) {
       return explanation.toLowerCase().replace(/\b(he|she)\b/g, pronoun('they'))
             .replace(/\b(he|she)'s\b/g, pronoun('they')+'\'s')
             .replace(/\b(him|her)\b/g, pronoun('them'))
