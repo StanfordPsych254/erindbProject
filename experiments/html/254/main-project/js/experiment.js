@@ -761,7 +761,7 @@ var experiment = {
     // Wait 1.5 seconds and then submit the whole experiment object to Mechanical Turk (mmturkey filters out the functions so we know we're just submitting properties [i.e. data])
     setTimeout(function() { turk.submit(experiment.data) }, 1500);
     console.log(JSON.stringify(experiment.data));
-    experiment.state.next = experiment.sn
+    experiment.state.next = experiment.nextBlock();
   },
   debriefing: function() {
     showSlide("debriefing");
