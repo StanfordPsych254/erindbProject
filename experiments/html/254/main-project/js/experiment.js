@@ -748,11 +748,11 @@ var experiment = {
             qtype: demographic
           })
         }
-        experiment.end()
+        experiment.nextBlock()
       }
     }
   },
-  end: function() {
+  finished: function() {
     clearInterval(mouseLoggerId);
     experiment.data.startTime = startTime;
     experiment.data.seed =  aRandomSeed;
@@ -761,10 +761,11 @@ var experiment = {
     // Wait 1.5 seconds and then submit the whole experiment object to Mechanical Turk (mmturkey filters out the functions so we know we're just submitting properties [i.e. data])
     setTimeout(function() { turk.submit(experiment.data) }, 1500);
     console.log(JSON.stringify(experiment.data));
+    experiment.state.next = experiment.sn
   },
-  finished: function() {
-    clearInterval(mouseLoggerId);
-    showSlide("finished");
+  debriefing: function() {
+    showSlide("debriefing");
+    experiment.state.next = experiment.nextBlock;
   },
   /// experiment functions
   /// (to get from one slide to the next or to skip ahead)
@@ -797,11 +798,11 @@ var experiment = {
 var nBlocks = experiment.stories.length;
 var experimentStates = ["instructions"].concat(
       rep("block", nBlocks)
-    ).concat(["demographic", "finished"]);
+    ).concat(["demographic", "debriefing", "finished"]);
 
 $(document).ready(function() {
 
-  $('.slide').hide(); //hide everything
+  // $('.slide').hide(); //hide everything
 
   //make sure turkers have accepted HIT (or you're not in mturk)
   if (turk.previewMode) {
