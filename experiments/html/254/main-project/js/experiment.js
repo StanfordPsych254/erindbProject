@@ -800,7 +800,21 @@ var experimentStates = ["instructions"].concat(
     ).concat(["demographic", "finished"]);
 
 $(document).ready(function() {
-  experiment.state.next();
+
+  $('.slide').hide(); //hide everything
+
+  //make sure turkers have accepted HIT (or you're not in mturk)
+  if (turk.previewMode) {
+    $("#mustaccept").show();
+  } else {
+    experiment.state.next();
+  }
+
+  var repeatWorker = false;
+  if (repeatWorker) {
+    $('.slide').empty();
+    alert("You have already completed the maximum number of HITs allowed by this requester. Please click 'Return HIT'.");
+  }
 })
 
 // -------- record all the events ----------
