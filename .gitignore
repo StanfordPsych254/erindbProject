@@ -1,3 +1,5 @@
 *.Rhistory
 *.RData
 data-collection/
+*_files
+*_cache

@@ -4,11 +4,37 @@ author: |
   | Erin Bennett
   | `erindb@stanford.edu`
 output:
+  html_document:
+    toc: false
+    highlight: zenburn
+    toc_depth: 3
   pdf_document:
     toc: false
     highlight: zenburn
     toc_depth: 3
 ---
+
+```{r global_options, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, cache=TRUE, message=FALSE, sanitiz =TRUE)
+```
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(pwr)
+library(jsonlite)
+library(ggplot2)
+library(ggthemes)
+theme_new <- theme_set(theme_few())
+
+# for bootstrapping 95% confidence intervals
+theta <- function(x,xdata) {mean(xdata[x])}
+ci.low <- function(x) {
+  quantile(bootstrap::bootstrap(1:length(x),1000,theta,x)$thetastar,.025)}
+ci.high <- function(x) {
+  quantile(bootstrap::bootstrap(1:length(x),1000,theta,x)$thetastar,.975)}
+```
 
 # Introduction
 
@@ -56,15 +82,14 @@ There are a few questions:
 
 # Methods
 
+The replication experiment can be found at this link: [http://erindb.me/254/main-project/](http://erindb.me/254/main-project/).
+
 ## Power analysis
 
 Original N=20.
 Planned N=20.
 
 ```{r, echo=F, warning=F, message=F}
-library(tidyr)
-library(dplyr)
-library(pwr)
 orig.d = data.frame(
   question = c('B|A', 'B|A and not C', 'B|A and explanation unknown', 'B|A and explanation absent', 'B|A and explanation present'),
   qnum = c(0, 2, 3, 4, 5),
@@ -136,7 +161,7 @@ In each block, first the causal statements in question are presented. These will
 
 Run t-tests to see whether the following replicate:
 
-* *Comparison 1:* $Answer2a < Answer1$
+* *Comparison 1:* $Answer2b < Answer1$
 * *Comparison 2:* $Answer1 \neq Answer3$
 
 ## Differences from original study
@@ -159,7 +184,77 @@ I will use some basic natural language processing to repeat back participants' e
 
 ## Data preparation
 
+```{r echo=F, message=F, warning=F}
+
+raw.data.path <- "../../data-collection/sandbox-results/"
+
+workers = c()
+
+d <- data.frame()
+files <- dir(raw.data.path,pattern="*.json")
+
+for (file.name in files) {
+
+  json_file <- readLines(paste(raw.data.path,file.name,sep=""))
+  json_file_str = paste(json_file, collapse = "")
+  json_file_str = gsub(",}", "}", json_file_str)
+  jso = jsonlite::fromJSON(json_file_str)
+  trials = jso$answers$data$trials
+  if (jso$WorkerId %in% workers) { 
+    trials$workerid = which(workers == jso$WorkerId)
+  } else {
+    workers = c(workers, jso$WorkerId)
+    trials$workerid = which(workers == jso$WorkerId)
+  }
+  demographics = jso$answers$data$demographics
+  for (i in 1:length(demographics)) {
+    trials[demographics[i,'qtype']] = demographics[i, 'response']
+  }
+  events = jso$answers$data$events
+  jso1 <- data.frame(trials)
+
+  d <- rbind(d, jso1)
+}
+```
+
 ## Confirmatory analysis
+
+```{r echo=F, message=F, warning=F}
+num = function(x) {return(as.numeric(as.character(x)))}
+answer1 = d %>% filter(qtype == 'probability', qnum == 0) %>% select(workerid, story, response)
+answer2b = d %>% filter(qtype == 'probability', qnum == 2) %>% select(workerid, story, response)
+answer3 = d %>% filter(qtype == 'probability', qnum == 3) %>% select(workerid, story, response)
+stopifnot(answer2b$story == answer3$story)
+stopifnot(answer1$story == answer3$story)
+stopifnot(answer2b$workerid == answer3$workerid)
+stopifnot(answer1$workerid == answer3$workerid)
+answers = data.frame(workerid = answer1$workerid,
+                     story = answer1$story,
+                     answer1 = num(answer1$response),
+                     answer2b = num(answer2b$response),
+                     answer3 = num(answer3$response))
+comp1 = with(answers, t.test(answer1, answer2b))
+comp2 = with(answers, t.test(answer1, answer3))
+replication.n = length(unique(d$workerid))
+```
+
+In a pilot with `r replication.n` non-naive participants, we do not find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r comp1$parameter`)=`r comp1$statistic`, p=`r comp1$p.value`), nor that they generalize this revision to other situations (t(`r comp2$parameter`)=`r comp2$statistic`, p=`r comp2$p.value`).
+
+```{r, fig.width=5, fig.height=3}
+d %>% filter(qnum %in% c(0, 2, 3)) %>%
+  mutate(question = factor(as.character(qnum),
+                           levels = c('0', '2', '3'),
+                           labels = c('question1', 'question2b', 'question3')),
+         probability = num(response)) %>%
+  group_by(question) %>%
+  summarise(mean.rating = mean(probability),
+            cil = ci.low(probability), 
+            cih = ci.high(probability))  %>%
+  ggplot(., aes(x=question, y=mean.rating)) +
+  geom_bar(stat='identity', fill='lightgray', colour='black') +
+  ylim(0, 1) +
+  geom_errorbar(width=0.1, aes(ymin=cil, ymax=cih, x=question))
+```
 
 ## Exploratory analyses
 
