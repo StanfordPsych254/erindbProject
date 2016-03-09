@@ -804,11 +804,14 @@ $(document).ready(function() {
 
   // $('.slide').hide(); //hide everything
   $('#instructions').show();
+  $("#mustaccept").hide();
+
 
   //make sure turkers have accepted HIT (or you're not in mturk)
   if (turk.previewMode) {
     $("#mustaccept").show();
   } else {
+    $("#mustaccept").hide();
     experiment.state.next();
   }
 
