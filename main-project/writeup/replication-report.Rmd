@@ -8,10 +8,6 @@ output:
     toc: false
     highlight: zenburn
     toc_depth: 3
-  pdf_document:
-    toc: false
-    highlight: zenburn
-    toc_depth: 3
 ---
 
 ```{r global_options, include=FALSE}
@@ -40,17 +36,19 @@ ci.high <- function(x) {
 
 This study is about how people revise their beliefs when they are presented with a counterexample to a causal relationship.
 
-There are a few questions:
+This research addresses a few questions:
 
 1. **Are other effects screened off from the effect in the counterexample, given that the cause happened?** That is, do people update their beliefs about that particular causal relationship in isolation, without influencing other parts of their theory? Or do they update their theory in a more complex way such that in this and other counterexamples, other things that usually result from the cause are also less likely? E.g. "My new neighbors tell me they are in a fraternity. I think they will have loud parties late at night and their apartment will be messy. If after a few weekends, the apartment is always really quiet, my expectation might be less strong that it's messy."
 
     Walsh & Sloman found that effects are not screened off and that the counterexample results in people expecting other possible consequents less.
     
+    The main comparison that I will consider a replication is Comparison 1.
+    
     *Comparison 1:* For "A causes B" and "A causes C", ask participants about two situations:
     
-    1) A is true. How likely is C?
+    1) A is true. How likely is C? (baseline)
     
-    2) A is true and B is false. How likely is C? 
+    2) A is true and B is false. How likely is C? (counterexample)
     
     If B and C are screened off from one another given A, then both questions should have the same answer. If participants are revising their theories in a more comples way, they might be different. In fact, the answer for 2 tends to be lower than the answer for 1.
 
@@ -68,15 +66,15 @@ There are a few questions:
     
     If B and C are screened off from one another given the explanation for the counterexample, then both questions should have the same answer. In fact, they do. -->
 
-2. **Do people revise their causal believes in the face of a counterexamples?** That is, are these exceptions, conditions, etc. already known and accounted for and participants just have enough evidence for them when they see the counterexample? Or are they adding them in as needed? E.g. "If a new fraternity replaces my neighbors that may or may not be nerdy (I just don't know), then will my experience with my quiet neighbors influence my expectations about the new fraternity?"
+2. **Do people revise their causal believes in the face of a counterexamples?** That is, are these exceptions, conditions, etc. already known and accounted for and participants just have enough evidence for them when they see the counterexample? Or are they adding them in as needed? E.g. "If a *new fraternity* replaces my neighbors that may or may not be nerdy (I just don't know), then will my experience with my quiet neighbors influence my expectations about the new fraternity?"
 
     Walsh & Sloman found that people have report different probabilities of effects given causes for (almost) the same question after the counterexample.
 
     *Comparison 2:* Ask participants about P(C|A) before and after the counterexample.
     
-    1) A is true. How likely is C?
+    1) A is true. How likely is C? (baseline)
         
-    2) A is true and you don't know whether that explanation you gave for the counterexample situation is true. How likely is C?
+    2) A is true and you don't know whether that explanation you gave for the counterexample situation is true. How likely is C? (generalization)
     
     If beliefs are not revised, you would expect no difference between these responses, because 2 has no more information than 1 (literally, at least). But in fact, responses to these questions tend to be different.
 
@@ -145,17 +143,17 @@ Each participant sees each story. Stories are presented one at a time, in blocks
 
 In each block, first the causal statements in question are presented. These will be visible for rest of the block. Then the following questions are asked (in order):
 
-1) A is true. How likely is C?
+1) A is true. How likely is C? (baseline)
 
 2) A is true and B is false.
-    a. Why do you think that is?
+    a. Why do you think that is? (counterexample)
     b. Also, how likely is C?
     
-3) A is true and you don't know whether *[the explanation you gave for 2a]* is true. How likely is C?
+3) A is true and you don't know whether *[the explanation you gave for 2a]* is true. How likely is C? (generalization)
 
-4) A is true and *[the explanation you gave for 2a]* is false. How likely is C?
+4) A is true and *[the explanation you gave for 2a]* is false. How likely is C? (explanation absent)
 
-5) A is true and *[the explanation you gave for 2a]* is true. How likely is C?
+5) A is true and *[the explanation you gave for 2a]* is true. How likely is C? (explanation present)
 
 ## Analysis plan
 
@@ -172,9 +170,9 @@ The setting will be online rather than in a lab, which means that participants m
 
 <!-- attention checks!!! -->
 
-I will use some basic natural language processing to repeat back participants' explanations with (hopefully) appropriate syntax. The original study used a human to do this task. Because doing this with a computer is more error-prone, I will have to ask the question in a slightly different way, giving participants a particular syntactic frame to fill in. The resulting program might respond to people with nonsense. It might be good if I could give participants an option to tell me whether the question I'm asking is nonsense so that I can exclude that data.
+I will use some basic natural language processing to repeat back participants' explanations with (hopefully) appropriate syntax. The original study used a human to do this task. Because doing this with a computer is more error-prone, I will have to ask the question in a slightly different way, giving participants a particular syntactic frame to fill in. The resulting program might respond to people with nonsense. Therefore, I also provide a checkbox for participants to mark if they "notice something strange about the way this question is worded".
 
-# Methos Addendum
+# Methods Addendum
 
 ## Actual sample
 
@@ -236,24 +234,83 @@ answers = data.frame(workerid = answer1$workerid,
 comp1 = with(answers, t.test(answer1, answer2b))
 comp2 = with(answers, t.test(answer1, answer3))
 replication.n = length(unique(d$workerid))
-```
-
-In a pilot with `r replication.n` non-naive participants, we do not find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r comp1$parameter`)=`r comp1$statistic`, p=`r comp1$p.value`), nor that they generalize this revision to other situations (t(`r comp2$parameter`)=`r comp2$statistic`, p=`r comp2$p.value`).
-
-```{r, fig.width=5, fig.height=3}
-d %>% filter(qnum %in% c(0, 2, 3)) %>%
+mean.probs = rbind(d %>% filter(qnum %in% c(0, 2, 3, 4, 5)) %>%
   mutate(question = factor(as.character(qnum),
-                           levels = c('0', '2', '3'),
-                           labels = c('question1', 'question2b', 'question3')),
+                           levels = c('0', '2', '3', '4', '5'),
+                           labels = c('baseline', 'counterexample',
+                                      'generalization', 'explanation absent',
+                                      'explanation present')),
          probability = num(response)) %>%
   group_by(question) %>%
   summarise(mean.rating = mean(probability),
             cil = ci.low(probability), 
-            cih = ci.high(probability))  %>%
-  ggplot(., aes(x=question, y=mean.rating)) +
-  geom_bar(stat='identity', fill='lightgray', colour='black') +
+            cih = ci.high(probability),
+            version = 'replication'),
+  data.frame(question = c('baseline', 'counterexample',
+                                      'generalization', 'explanation absent',
+                                      'explanation present'),
+             mean.rating = c(.85, .63, .71, .85, .62),
+             cil = c(.85, .63, .71, .85, .62),
+             cih = c(.85, .63, .71, .85, .62),
+             version = 'original'))
+```
+    
+The main comparison that I will consider a replication is Comparison 1.
+
+We ran a paired t-test on the comparison between question 1 (baseline) and question 2b (counterexample). In a pilot with `r replication.n` non-naive participants, we do not find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r comp1$parameter`)=`r comp1$statistic`, p=`r comp1$p.value`).
+
+```{r, fig.width=5, fig.height=3}
+mycolors = c('steelblue', 'coral', 'goldenrod1', 'forestgreen', 'violet')
+mean.probs %>% filter(question %in% c('baseline', 'counterexample'))  %>%
+  ggplot(., aes(x=question, y=mean.rating, colour=question, fill=question)) +
+  geom_bar(stat='identity', alpha=1/3) +
   ylim(0, 1) +
-  geom_errorbar(width=0.1, aes(ymin=cil, ymax=cih, x=question))
+  xlab('condition') +
+  ylab('average probability rating') +
+  geom_errorbar(width=0.1, aes(ymin=cil, ymax=cih, x=question)) +
+  scale_colour_manual(values=mycolors) +
+  scale_fill_manual(values=mycolors) +
+  theme_few() +
+  facet_grid(~version) +
+  theme(axis.text.x = element_text(angle = -35, hjust = 0))
+```
+
+A secondary comparison is the comparison between question 1 (baseline) and question 3 (generalization).
+
+We again ran a paired t-test and did not find evidence that these participants generalize this revision to other situations (t(`r comp2$parameter`)=`r comp2$statistic`, p=`r comp2$p.value`).
+
+```{r, fig.width=5, fig.height=3}
+mycolors = c('steelblue', 'coral', 'goldenrod1', 'forestgreen', 'violet')
+mean.probs %>% filter(question %in% c('baseline', 'generalization'))  %>%
+  ggplot(., aes(x=question, y=mean.rating, colour=question, fill=question)) +
+  geom_bar(stat='identity', alpha=1/3) +
+  ylim(0, 1) +
+  xlab('condition') +
+  ylab('average probability rating') +
+  geom_errorbar(width=0.1, aes(ymin=cil, ymax=cih, x=question)) +
+  scale_colour_manual(values=c('steelblue', 'goldenrod1', 'forestgreen', 'violet')) +
+  scale_fill_manual(values=c('steelblue', 'goldenrod1', 'forestgreen', 'violet')) +
+  theme_few() +
+  facet_grid(~version) +
+  theme(axis.text.x = element_text(angle = -35, hjust = 0))
+```
+
+Qualitatively, we found similar results in the pilot replication with non-naive participants as in the original study.
+
+```{r, fig.width=10, fig.height=6}
+mycolors = c('steelblue', 'coral', 'goldenrod1', 'forestgreen', 'violet')
+mean.probs %>% 
+  ggplot(., aes(x=question, y=mean.rating, colour=question, fill=question)) +
+  geom_bar(stat='identity', alpha=1/3) +
+  ylim(0, 1) +
+  xlab('condition') +
+  ylab('average probability rating') +
+  geom_errorbar(width=0.1, aes(ymin=cil, ymax=cih, x=question)) +
+  scale_colour_manual(values=mycolors) +
+  scale_fill_manual(values=mycolors) +
+  theme_few() +
+  facet_grid(~version) +
+  theme(axis.text.x = element_text(angle = -35, hjust = 0))
 ```
 
 ## Exploratory analyses
