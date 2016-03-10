@@ -111,9 +111,11 @@ orig.rs$power = mapply(function(n, d) {return(pwr.t.test(n=n, d=d, sig.level=0.0
 orig.rs$expectedES = mapply(function(n, power) {return(pwr.t.test(n=n, power=power, sig.level=0.05, type='paired')$d)}, orig.rs$n, orig.rs$power)
 ```
 
-Effect size for the first comparison -- P(B|A) versus P(B|A and not C) -- was 1.12, so with the same sample size the power will be 0.999.
+Effect size for the first comparison -- P(B|A) versus P(B|A and not C) -- was 1.12, so with the same sample size the power will be d=0.999 (Cohen's d).
 
-Effect size for the second comparison -- P(B|A) versus P(B|A and explanation unknown) -- was 1.20, so with the same sample size the power will be 0.999.
+Effect size for the second comparison -- P(B|A) versus P(B|A and explanation unknown) -- was 1.20, so with the same sample size the power will be 0.999 (Cohen's d).
+
+I will run an additional 5% (1 participant) so that I can exclude answers to question 3 (generalization) in which participants rated the question as strangely worded.
 
 ## Planned sample
 
@@ -130,7 +132,7 @@ Stories:
 <!-- * Following this diet causes you to have a good supply of iron. Following this diet causes you to lose weight.
 * Playing loud music in Paul’s apartment causes the neighbors on his left to complain. Playing loud music in Paul’s apartment causes the neighbors on his right to increase the volume on their TV. -->
 
-These stories were (I think) designed such that the effects would not directly affect one another, though I'm not sure they succeeded. I created seven more items with this intended causes structure.
+These stories were designed such that the effects would not directly affect one another. I created seven more items with this intended causal structure.
 
 * Drinking coffee causes a person to stay up late. Drinking coffee causes a person to be more focused.
 * Going to the beach on a sunny day causes a person to get a suntan. Going to the beach on a sunny day causes a person to see surfers.
@@ -175,6 +177,8 @@ The setting will be online rather than in a lab, which means that participants m
 
 I will use some basic natural language processing to repeat back participants' explanations with (hopefully) appropriate syntax. The original study used a human to do this task. Because doing this with a computer is more error-prone, I will have to ask the question in a slightly different way, giving participants a particular syntactic frame to fill in. The resulting program might respond to people with nonsense. Therefore, I also provide a checkbox for participants to mark if they "notice something strange about the way this question is worded".
 
+In addition, I used some of the stories that the original authors used, but also added some new ones. And I use 10 questions in total, rather than 6.
+
 # Methods Addendum
 
 ## Actual sample
@@ -211,10 +215,25 @@ for (file.name in files) {
   for (i in 1:nrow(demographics)) {
     trials[demographics[i,'qtype']] = demographics[i, 'response']
   }
+  trials$minutes = (max(jso$answers$data$events$time) - min(jso$answers$data$events$time)) / 60000
   events = jso$answers$data$events
   jso1 <- data.frame(trials)
 
   d <- rbind(d, jso1)
+}
+
+ungrammatical = d[d$qtype=='ungrammatical' & d$response==T & !is.na(d$response),] %>%
+  select(qnum, story)
+ungrammatical.explanations = d$response[d$qtype=='explanation' & d$story%in%ungrammatical$story]
+```
+
+I will exclude from analysis answers where participants marked that trial as strangely worded. This will not affect question 1 (baseline) or quesiton 2 (counterexample), since those questions do not echo back participants explanations. This will, however, affect question 3 (generalization).
+
+```{r, echo=T}
+for (i in 1:nrow(ungrammatical)) {
+  exclude.qnum = ungrammatical[i, 'qnum']
+  exclude.story = ungrammatical[i, 'story']
+  d = d %>% filter(!(qnum==exclude.qnum & story==exclude.story))
 }
 ```
 
@@ -223,7 +242,7 @@ for (file.name in files) {
 ```{r echo=F, message=F, warning=F}
 num = function(x) {return(as.numeric(as.character(x)))}
 
-probs = d %>% filter(qnum %in% c(0, 2, 3, 4, 5)) %>%
+probs = d %>% filter(qnum %in% c(0, 2, 3, 4, 5) & qtype=='probability') %>%
   mutate(question = factor(as.character(qnum),
                            levels = c('0', '2', '3', '4', '5'),
                            labels = c('baseline', 'counterexample',
@@ -234,7 +253,7 @@ probs = d %>% filter(qnum %in% c(0, 2, 3, 4, 5)) %>%
 mean.probs = rbind(
   probs %>%
     group_by(question, workerid) %>%
-    summarise(probability = mean(probability)) %>%
+    summarise(probability = mean(probability, na.rm=T)) %>%
     summarise(mean.rating = mean(probability),
               cil = ci.low(probability), 
               cih = ci.high(probability),
@@ -249,29 +268,19 @@ mean.probs = rbind(
 ```
 
 ```{r echo=T}
-cond.probs = probs %>% group_by(question, story, workerid) %>%
-  summarise(probability = mean(probability))
+cond.probs = probs %>% group_by(question, workerid) %>%
+  summarise(probability = mean(probability, na.rm=T)) %>%
+  as.data.frame %>%
+  spread(question, probability)
 
-answer1 = cond.probs %>% filter(question == 'baseline') %>% select(workerid, story, probability)
-answer2b = cond.probs %>% filter(question == 'counterexample') %>% select(workerid, story, probability)
-answer3 = cond.probs %>%  filter(question == 'generalization') %>% select(workerid, story, probability)
-stopifnot(answer2b$story == answer3$story)
-stopifnot(answer1$story == answer3$story)
-stopifnot(answer2b$workerid == answer3$workerid)
-stopifnot(answer1$workerid == answer3$workerid)
-answers = data.frame(workerid = answer1$workerid,
-                     story = answer1$story,
-                     answer1 = num(answer1$probability),
-                     answer2b = num(answer2b$probability),
-                     answer3 = num(answer3$probability))
-comp1 = with(answers, t.test(answer1, answer2b))
-comp2 = with(answers, t.test(answer1, answer3))
+comp1 = with(cond.probs, t.test(baseline, counterexample))
+comp2 = with(cond.probs, t.test(baseline, generalization))
 replication.n = length(unique(d$workerid))
 ```
     
 The main comparison that I will consider a replication is Comparison 1.
 
-We ran a paired t-test on the comparison between a participant's average responses to question 1 (baseline) and question 2b (counterexample). In a pilot with `r replication.n` naive participants, we do not find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r comp1$parameter`)=`r comp1$statistic`, p=`r comp1$p.value`).
+We ran a paired t-test on the comparison between a participant's average responses to question 1 (baseline) and question 2b (counterexample). We (do not) find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r round(comp1$parameter, digits=2)`)=`r round(comp1$statistic, digits=2)`, p=`r round(comp1$p.value, digits=2)`).
 
 ```{r, fig.width=5, fig.height=3}
 mycolors = c('steelblue', 'coral', 'goldenrod1', 'forestgreen', 'violet')
@@ -291,7 +300,7 @@ mean.probs %>% filter(question %in% c('baseline', 'counterexample'))  %>%
 
 A secondary comparison is the comparison between question 1 (baseline) and question 3 (generalization).
 
-We again ran a paired t-test and did not find evidence that these participants generalize this revision to other situations (t(`r comp2$parameter`)=`r comp2$statistic`, p=`r comp2$p.value`).
+We again ran a paired t-test and (did not) find evidence that these participants generalize this revision to other situations (t(`r round(comp2$parameter, digits=2)`)=`r round(comp2$statistic, digits=2)`, p=`r round(comp2$p.value, digits=2)`).
 
 ```{r, fig.width=5, fig.height=3}
 mycolors = c('steelblue', 'coral', 'goldenrod1', 'forestgreen', 'violet')
@@ -309,13 +318,21 @@ mean.probs %>% filter(question %in% c('baseline', 'generalization'))  %>%
   theme(axis.text.x = element_text(angle = -35, hjust = 0))
 ```
 
-Because the specific scenarios might matter to participants' responses, we will also run a mixed effects linear regression with random effects for scenario.
+Because the specific scenarios might matter to participants' responses, we will also run a mixed effects linear regression with random slopes for scenario and participant.
 
 ```{r}
-fit = probs %>% filter(question %in% c('baseline', 'counterexample')) %>%
-  lmer(probability ~ question + (1 | story), .)
-summary(fit)
+fit1 = probs %>% filter(question %in% c('baseline', 'counterexample')) %>%
+  lmer(probability ~ question + (question | story) + (question | workerid), .)
+coefs1 <- data.frame(coef(summary(fit1)))
+
+fit2 = probs %>% filter(question %in% c('baseline', 'generalization')) %>%
+  lmer(probability ~ question + (question | story) + (question | workerid), .)
+coefs2 <- data.frame(coef(summary(fit2)))
 ```
+
+We (do not) find a significant effect of question for comparison 1, b=`r round(coefs1$Estimate[2], digits=2)`, t(`r round(coefs1$df[2], digits=2)`)=`r round(coefs1$t.value[2], digits=2)`, p=`r round(coefs1$Pr...t..[2], digits=2)`.
+
+We (do not) find a significant effect of question for comparison 2, b=`r round(coefs2$Estimate[2], digits=2)`, t(`r round(coefs2$df[2], digits=2)`)=`r round(coefs2$t.value[2], digits=2)`, p=`r round(coefs2$Pr...t..[2], digits=2)`.
 
 <!--
 
@@ -378,12 +395,6 @@ probs %>%
 #   theme(axis.text.x = element_text(angle = -35, hjust = 0))
 ```
 -->
-
-
-```{r}
-lm.fit = lm(probability ~ question, probs)
-lmer.fit = lmer(probability ~ question + (1+question|story) + (1+question|workerid), probs)
-```
 
 # Discussion
 
