@@ -662,6 +662,18 @@ var experiment = {
             qnum: experiment.state.qnum,
             blocknum: experiment.state.blocknum
           });
+          experiment.data.trials.push({
+            response: $('#ungrammatical').prop('checked'),
+            time: responseTime,
+              rt: responseTime - experiment.state.trialStartTime,
+              qtype: 'ungrammatical',
+              story: experiment.state.storyLabel,
+              name: experiment.state.name.Name,
+              gender: experiment.state.name.gender,
+              trialnum: experiment.state.trialnum,
+              qnum: experiment.state.qnum,
+              blocknum: experiment.state.blocknum
+          });
           return true;
         } else {
           return false;
@@ -678,18 +690,6 @@ var experiment = {
             time: responseTime,
               rt: responseTime - experiment.state.trialStartTime,
               qtype: qtype,
-              story: experiment.state.storyLabel,
-              name: experiment.state.name.Name,
-              gender: experiment.state.name.gender,
-              trialnum: experiment.state.trialnum,
-              qnum: experiment.state.qnum,
-              blocknum: experiment.state.blocknum
-          })
-          experiment.data.trials.push({
-            response: ungrammatical,
-            time: responseTime,
-              rt: responseTime - experiment.state.trialStartTime,
-              qtype: 'ungrammatical',
               story: experiment.state.storyLabel,
               name: experiment.state.name.Name,
               gender: experiment.state.name.gender,

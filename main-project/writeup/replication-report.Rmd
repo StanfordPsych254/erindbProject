@@ -6,7 +6,6 @@ author: |
 output:
   html_document:
     toc: false
-    highlight: zenburn
     toc_depth: 3
 ---
 
@@ -25,6 +24,8 @@ library(ggthemes)
 library(lme4)
 library(lmerTest)
 theme_new <- theme_set(theme_few())
+
+options(digits=2)
 
 # for bootstrapping 95% confidence intervals
 theta <- function(x,xdata) {mean(xdata[x])}
@@ -207,7 +208,7 @@ for (file.name in files) {
     trials$workerid = which(workers == jso$WorkerId)
   }
   demographics = jso$answers$data$demographics
-  for (i in 1:length(demographics)) {
+  for (i in 1:nrow(demographics)) {
     trials[demographics[i,'qtype']] = demographics[i, 'response']
   }
   events = jso$answers$data$events
@@ -221,21 +222,7 @@ for (file.name in files) {
 
 ```{r echo=F, message=F, warning=F}
 num = function(x) {return(as.numeric(as.character(x)))}
-answer1 = d %>% filter(qtype == 'probability', qnum == 0) %>% select(workerid, story, response)
-answer2b = d %>% filter(qtype == 'probability', qnum == 2) %>% select(workerid, story, response)
-answer3 = d %>% filter(qtype == 'probability', qnum == 3) %>% select(workerid, story, response)
-stopifnot(answer2b$story == answer3$story)
-stopifnot(answer1$story == answer3$story)
-stopifnot(answer2b$workerid == answer3$workerid)
-stopifnot(answer1$workerid == answer3$workerid)
-answers = data.frame(workerid = answer1$workerid,
-                     story = answer1$story,
-                     answer1 = num(answer1$response),
-                     answer2b = num(answer2b$response),
-                     answer3 = num(answer3$response))
-comp1 = with(answers, t.test(answer1, answer2b))
-comp2 = with(answers, t.test(answer1, answer3))
-replication.n = length(unique(d$workerid))
+
 probs = d %>% filter(qnum %in% c(0, 2, 3, 4, 5)) %>%
   mutate(question = factor(as.character(qnum),
                            levels = c('0', '2', '3', '4', '5'),
@@ -243,24 +230,48 @@ probs = d %>% filter(qnum %in% c(0, 2, 3, 4, 5)) %>%
                                       'generalization', 'explanation absent',
                                       'explanation present')),
          probability = num(response))
-mean.probs = rbind(probs %>%
-  group_by(question) %>%
-  summarise(mean.rating = mean(probability),
-            cil = ci.low(probability), 
-            cih = ci.high(probability),
-            version = 'replication'),
+
+mean.probs = rbind(
+  probs %>%
+    group_by(question, workerid) %>%
+    summarise(probability = mean(probability)) %>%
+    summarise(mean.rating = mean(probability),
+              cil = ci.low(probability), 
+              cih = ci.high(probability),
+              version = 'replication'),
   data.frame(question = c('baseline', 'counterexample',
-                                      'generalization', 'explanation absent',
-                                      'explanation present'),
+                          'generalization', 'explanation absent',
+                          'explanation present'),
              mean.rating = c(.85, .63, .71, .85, .62),
              cil = c(.85, .63, .71, .85, .62),
              cih = c(.85, .63, .71, .85, .62),
              version = 'original'))
 ```
+
+```{r echo=T}
+cond.probs = probs %>% group_by(question, story, workerid) %>%
+  summarise(probability = mean(probability))
+
+answer1 = cond.probs %>% filter(question == 'baseline') %>% select(workerid, story, probability)
+answer2b = cond.probs %>% filter(question == 'counterexample') %>% select(workerid, story, probability)
+answer3 = cond.probs %>%  filter(question == 'generalization') %>% select(workerid, story, probability)
+stopifnot(answer2b$story == answer3$story)
+stopifnot(answer1$story == answer3$story)
+stopifnot(answer2b$workerid == answer3$workerid)
+stopifnot(answer1$workerid == answer3$workerid)
+answers = data.frame(workerid = answer1$workerid,
+                     story = answer1$story,
+                     answer1 = num(answer1$probability),
+                     answer2b = num(answer2b$probability),
+                     answer3 = num(answer3$probability))
+comp1 = with(answers, t.test(answer1, answer2b))
+comp2 = with(answers, t.test(answer1, answer3))
+replication.n = length(unique(d$workerid))
+```
     
 The main comparison that I will consider a replication is Comparison 1.
 
-We ran a paired t-test on the comparison between question 1 (baseline) and question 2b (counterexample). In a pilot with `r replication.n` naive participants, we do not find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r comp1$parameter`)=`r comp1$statistic`, p=`r comp1$p.value`).
+We ran a paired t-test on the comparison between a participant's average responses to question 1 (baseline) and question 2b (counterexample). In a pilot with `r replication.n` naive participants, we do not find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r comp1$parameter`)=`r comp1$statistic`, p=`r comp1$p.value`).
 
 ```{r, fig.width=5, fig.height=3}
 mycolors = c('steelblue', 'coral', 'goldenrod1', 'forestgreen', 'violet')
@@ -296,6 +307,14 @@ mean.probs %>% filter(question %in% c('baseline', 'generalization'))  %>%
   theme_few() +
   facet_grid(~version) +
   theme(axis.text.x = element_text(angle = -35, hjust = 0))
+```
+
+Because the specific scenarios might matter to participants' responses, we will also run a mixed effects linear regression with random effects for scenario.
+
+```{r}
+fit = probs %>% filter(question %in% c('baseline', 'counterexample')) %>%
+  lmer(probability ~ question + (1 | story), .)
+summary(fit)
 ```
 
 <!--
