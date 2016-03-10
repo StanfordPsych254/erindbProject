@@ -284,7 +284,6 @@ var experiment = {
   // store state information here
   state: {
     trialnum: -1,
-    responsenum: -1,
     blocknum: -1,
     blockN: -1,
     qnum: -1,
@@ -489,6 +488,7 @@ var experiment = {
   setState: function(type) {
     experiment.state.trialStartTime = time();
     experiment.progress();
+    experiment.state.trialnum++;
     if (type=="block") {
       experiment.state.explanation = "NA";
       experiment.state.blocknum++;
