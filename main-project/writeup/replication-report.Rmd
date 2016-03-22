@@ -223,18 +223,26 @@ for (file.name in files) {
 }
 
 ungrammatical = d[d$qtype=='ungrammatical' & d$response==T & !is.na(d$response),] %>%
-  select(qnum, story)
-ungrammatical.explanations = d$response[d$qtype=='explanation' & d$story%in%ungrammatical$story]
+  select(qnum, story, workerid)
+ungrammatical.explanations = d$response[
+  d$qtype=='explanation' & d$story %in% ungrammatical$story
+]
 ```
 
 I will exclude from analysis answers where participants marked that trial as strangely worded. This will not affect question 1 (baseline) or quesiton 2 (counterexample), since those questions do not echo back participants explanations. This will, however, affect question 3 (generalization).
 
 ```{r, echo=T}
+all.data = d
 for (i in 1:nrow(ungrammatical)) {
   exclude.qnum = ungrammatical[i, 'qnum']
   exclude.story = ungrammatical[i, 'story']
-  d = d %>% filter(!(qnum==exclude.qnum & story==exclude.story))
+  exclude.workerid = ungrammatical[i, 'workerid']
+  d = d %>% filter(!(
+    workerid==exclude.workerid &
+      qnum==exclude.qnum &
+      story==exclude.story))
 }
+stopifnot(nrow(all.data) - nrow(ungrammatical)*2 == nrow(d))
 ```
 
 ## Confirmatory analysis
@@ -273,14 +281,16 @@ cond.probs = probs %>% group_by(question, workerid) %>%
   as.data.frame %>%
   spread(question, probability)
 
-comp1 = with(cond.probs, t.test(baseline, counterexample))
-comp2 = with(cond.probs, t.test(baseline, generalization))
+comp1 = with(cond.probs, t.test(baseline, counterexample, paired=T))
+comp2 = with(cond.probs, t.test(baseline, generalization, paired=T))
+comp3 = with(cond.probs, t.test(baseline, `explanation absent`, paired=T))
+comp4 = with(cond.probs, t.test(counterexample, `explanation present`, paired=T))
 replication.n = length(unique(d$workerid))
 ```
     
 The main comparison that I will consider a replication is Comparison 1.
 
-We ran a paired t-test on the comparison between a participant's average responses to question 1 (baseline) and question 2b (counterexample). We (do not) find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r round(comp1$parameter, digits=2)`)=`r round(comp1$statistic, digits=2)`, p=`r round(comp1$p.value, digits=2)`).
+We ran a paired t-test on the comparison between a participant's average responses to question 1 (baseline) and question 2b (counterexample). We find evidence that people revise their causal beliefs about other aspects of a particular situation (t(`r round(comp1$parameter, digits=2)`)=`r round(comp1$statistic, digits=2)`, p=`r round(comp1$p.value, digits=4)`).
 
 ```{r, fig.width=5, fig.height=3}
 mycolors = c('steelblue', 'coral', 'goldenrod1', 'forestgreen', 'violet')
@@ -298,9 +308,11 @@ mean.probs %>% filter(question %in% c('baseline', 'counterexample'))  %>%
   theme(axis.text.x = element_text(angle = -35, hjust = 0))
 ```
 
+
 A secondary comparison is the comparison between question 1 (baseline) and question 3 (generalization).
 
-We again ran a paired t-test and (did not) find evidence that these participants generalize this revision to other situations (t(`r round(comp2$parameter, digits=2)`)=`r round(comp2$statistic, digits=2)`, p=`r round(comp2$p.value, digits=2)`).
+We again ran a paired t-test and find evidence that these participants generalize this revision to other situations (t(`r round(comp2$parameter, digits=2)`)=`r round(comp2$statistic, digits=2)`, p=`r round(comp2$p.value, digits=4)`).
+
 
 ```{r, fig.width=5, fig.height=3}
 mycolors = c('steelblue', 'coral', 'goldenrod1', 'forestgreen', 'violet')
@@ -328,14 +340,16 @@ coefs1 <- data.frame(coef(summary(fit1)))
 fit2 = probs %>% filter(question %in% c('baseline', 'generalization')) %>%
   lmer(probability ~ question + (question | story) + (question | workerid), .)
 coefs2 <- data.frame(coef(summary(fit2)))
+
+# summary(fit1)
+# summary(fit2)
 ```
 
-We (do not) find a significant effect of question for comparison 1, b=`r round(coefs1$Estimate[2], digits=2)`, t(`r round(coefs1$df[2], digits=2)`)=`r round(coefs1$t.value[2], digits=2)`, p=`r round(coefs1$Pr...t..[2], digits=2)`.
+We find a significant effect of question for comparison 1, b=`r round(coefs1$Estimate[2], digits=2)`, t(`r round(coefs1$df[2], digits=2)`)=`r round(coefs1$t.value[2], digits=2)`, p=`r round(coefs1$Pr...t..[2], digits=4)`.
 
-We (do not) find a significant effect of question for comparison 2, b=`r round(coefs2$Estimate[2], digits=2)`, t(`r round(coefs2$df[2], digits=2)`)=`r round(coefs2$t.value[2], digits=2)`, p=`r round(coefs2$Pr...t..[2], digits=2)`.
+We find a significant effect of question for comparison 2, b=`r round(coefs2$Estimate[2], digits=2)`, t(`r round(coefs2$df[2], digits=2)`)=`r round(coefs2$t.value[2], digits=2)`, p=`r round(coefs2$Pr...t..[2], digits=4)`.
 
 <!--
-
 Qualitatively, we did not find very similar results in the pilot replication with naive participants as in the original study.
 
 ```{r, fig.width=10, fig.height=6}
@@ -353,7 +367,9 @@ mean.probs %>%
   facet_grid(~version) +
   theme(axis.text.x = element_text(angle = -35, hjust = 0))
 ```
+-->
 
+<!--
 ## Exploratory analyses
 
 Breaking down by story, it looks like the original stories have much greater differences among ratings than the new ones that I wrote. This might be because I tried to deal with the confound of the truth values of the effects directly influencing each other, by making the effects conditionally independent of each other given the cause.
@@ -400,4 +416,8 @@ probs %>%
 
 ## Summary of replication attempt
 
+Overall, it seems like the main effects that we sought to replicate from Walsh and Sloman's study hold in this replication, despite there being several changes in our sample population and methodology.
+
+<!--
 ## Commentary
+-->
