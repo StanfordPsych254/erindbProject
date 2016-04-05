@@ -191,36 +191,40 @@ In addition, I used some of the stories that the original authors used, but also
 
 ```{r echo=F, message=F, warning=F}
 
-raw.data.path <- "../../data-collection/production-results/"
+# raw.data.path <- "../data-collection/production-results/"
+# 
+# workers = c()
+# 
+# d <- data.frame()
+# files <- dir(raw.data.path,pattern="*.json")
+# 
+# for (file.name in files) {
+# 
+#   json_file <- readLines(paste(raw.data.path,file.name,sep=""))
+#   json_file_str = paste(json_file, collapse = "")
+#   json_file_str = gsub(",}", "}", json_file_str)
+#   jso = jsonlite::fromJSON(json_file_str)
+#   trials = jso$answers$data$trials
+#   if (jso$WorkerId %in% workers) { 
+#     trials$workerid = which(workers == jso$WorkerId)
+#   } else {
+#     workers = c(workers, jso$WorkerId)
+#     trials$workerid = which(workers == jso$WorkerId)
+#   }
+#   demographics = jso$answers$data$demographics
+#   for (i in 1:nrow(demographics)) {
+#     trials[demographics[i,'qtype']] = demographics[i, 'response']
+#   }
+#   trials$minutes = (max(jso$answers$data$events$time) - min(jso$answers$data$events$time)) / 60000
+#   events = jso$answers$data$events
+#   jso1 <- data.frame(trials)
+# 
+#   d <- rbind(d, jso1)
+# }
+# 
+# write.csv(d, 'anonymized-data.csv')
 
-workers = c()
-
-d <- data.frame()
-files <- dir(raw.data.path,pattern="*.json")
-
-for (file.name in files) {
-
-  json_file <- readLines(paste(raw.data.path,file.name,sep=""))
-  json_file_str = paste(json_file, collapse = "")
-  json_file_str = gsub(",}", "}", json_file_str)
-  jso = jsonlite::fromJSON(json_file_str)
-  trials = jso$answers$data$trials
-  if (jso$WorkerId %in% workers) { 
-    trials$workerid = which(workers == jso$WorkerId)
-  } else {
-    workers = c(workers, jso$WorkerId)
-    trials$workerid = which(workers == jso$WorkerId)
-  }
-  demographics = jso$answers$data$demographics
-  for (i in 1:nrow(demographics)) {
-    trials[demographics[i,'qtype']] = demographics[i, 'response']
-  }
-  trials$minutes = (max(jso$answers$data$events$time) - min(jso$answers$data$events$time)) / 60000
-  events = jso$answers$data$events
-  jso1 <- data.frame(trials)
-
-  d <- rbind(d, jso1)
-}
+d = read.csv('anonymized-data.csv')
 
 ungrammatical = d[d$qtype=='ungrammatical' & d$response==T & !is.na(d$response),] %>%
   select(qnum, story, workerid)
@@ -306,6 +310,7 @@ mean.probs %>% filter(question %in% c('baseline', 'counterexample'))  %>%
   theme_few() +
   facet_grid(~version) +
   theme(axis.text.x = element_text(angle = -35, hjust = 0))
+ggsave('replication.png', width=8, height=4)
 ```
 
 
@@ -328,6 +333,7 @@ mean.probs %>% filter(question %in% c('baseline', 'generalization'))  %>%
   theme_few() +
   facet_grid(~version) +
   theme(axis.text.x = element_text(angle = -35, hjust = 0))
+ggsave('replication2.png', width=8, height=4)
 ```
 
 Because the specific scenarios might matter to participants' responses, we will also run a mixed effects linear regression with random slopes for scenario and participant.
