@@ -1,15 +1,22 @@
 # Experiment to replicate in this project
 
-## Main project
-
 Paper: Walsh & Sloman (2004)
 
 Experiment: Experiment 2
 
 # Directory structure
 
-* `main-project`
-	- `original_paper/WalshSloman2004.pdf`
-	- `writeup/propsal.Rmd`
+* `experiments/`
+	- HTML/JS experiment to run on mTurk
+* `original_paper`
+	- information about original study
+* `writeup/`
+	- `propsal.Rmd`
 		* short justification
 		* description of stimuli and procedures
+	- `replication-report.Rmd`
+		* description of replication and results
+	- `anonymized-data.csv`
+		* an anonymized data file that I used
+* `anonymized-results/`
+	- anonymized data in 254 class format
